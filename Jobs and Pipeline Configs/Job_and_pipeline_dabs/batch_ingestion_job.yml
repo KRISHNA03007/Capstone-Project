@@ -1,0 +1,82 @@
+resources:
+  jobs:
+    Batch_Ingestion_Job:
+      name: Batch Ingestion Job
+      trigger:
+        pause_status: UNPAUSED
+        periodic:
+          interval: 1
+          unit: DAYS
+      tasks:
+        - task_key: Ingest_Customers
+          notebook_task:
+            notebook_path: /Workspace/Users/ishvi101@outlook.com/Capstone-Project/mongo_ingestion/Customers
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+          libraries:
+            - maven:
+                coordinates: org.mongodb.spark:mongo-spark-connector_2.12:10.4.0
+        - task_key: Ingest_Products
+          notebook_task:
+            notebook_path: /Workspace/Users/ishvi101@outlook.com/Capstone-Project/mongo_ingestion/Products
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+          libraries:
+            - maven:
+                coordinates: org.mongodb.spark:mongo-spark-connector_2.12:10.4.0
+        - task_key: Ingest_Promotions
+          notebook_task:
+            notebook_path: /Workspace/Users/xylorex1919@gmail.com/Capstone-Project/adls_ingestion/promotions_ingestion
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+        - task_key: Ingest_Regions
+          notebook_task:
+            notebook_path: /Workspace/Users/xylorex1919@gmail.com/Capstone-Project/adls_ingestion/region_ingestion
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+        - task_key: Ingest_Returns
+          notebook_task:
+            notebook_path: /Workspace/Users/xylorex1919@gmail.com/Capstone-Project/adls_ingestion/returns_ingestion
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+        - task_key: Ingest_Stores
+          notebook_task:
+            notebook_path: /Workspace/Users/xylorex1919@gmail.com/Capstone-Project/adls_ingestion/Stores_ingestion
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+        - task_key: Ingest_Transactions
+          notebook_task:
+            notebook_path: /Workspace/Users/xylorex1919@gmail.com/Capstone-Project/adls_ingestion/transaction_ingestion
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+        - task_key: Ingest_calender
+          notebook_task:
+            notebook_path: /Workspace/Users/xylorex1919@gmail.com/Capstone-Project/adls_ingestion/calender_generation
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+        - task_key: Triggering_Silver_DLT
+          depends_on:
+            - task_key: Ingest_calender
+            - task_key: Ingest_Customers
+            - task_key: Ingest_Products
+            - task_key: Ingest_Transactions
+            - task_key: Ingest_Returns
+            - task_key: Ingest_Promotions
+            - task_key: Ingest_Stores
+            - task_key: Ingest_Regions
+          run_if: AT_LEAST_ONE_SUCCESS
+          pipeline_task:
+            pipeline_id: 18e5e461-744e-4592-af76-c8408b4e7e9b
+      job_clusters:
+        - job_cluster_key: Job_cluster
+          new_cluster:
+            cluster_name: ""
+            spark_version: 13.3.x-scala2.12
+            node_type_id: Standard_D4a_v4
+            data_security_mode: DATA_SECURITY_MODE_DEDICATED
+            runtime_engine: STANDARD
+            kind: CLASSIC_PREVIEW
+            is_single_node: true
+      queue:
+        enabled: true
+      performance_target: PERFORMANCE_OPTIMIZED
