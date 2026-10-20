@@ -1,0 +1,69 @@
+name: Databricks Asset Bundle Deployment
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate:
+    name: Validate Bundle Syntax
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Databricks CLI
+        uses: databricks/setup-cli@main
+
+      - name: Validate Bundle
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+        run: |
+          databricks bundle validate
+
+  deploy-main:
+    name: Deploy and Update Shared Folder
+    needs: validate
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Databricks CLI
+        uses: databricks/setup-cli@main
+
+      - name: Deploy Bundle to Main Target
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+        run: |
+          databricks bundle deploy --target main
+
+      - name: Configure Git Credentials
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+        run: |
+          CRED_ID=$(databricks git-credentials list -o json 2>/dev/null | jq -r '.. | .credential_id? // empty' | head -n 1)
+          if [ -n "$CRED_ID" ]; then
+            databricks git-credentials update "$CRED_ID" gitHub \
+              --git-username xylorex1919 \
+              --personal-access-token "${{ secrets.GIT_PAT }}"
+          else
+            databricks git-credentials create gitHub \
+              --git-username xylorex1919 \
+              --personal-access-token "${{ secrets.GIT_PAT }}"
+          fi
+
+      - name: Update Shared Git Folder
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+        run: |
+          databricks repos update /Workspace/Shared/Capstone-Project-Prod --branch main
