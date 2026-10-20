@@ -1,0 +1,45 @@
+bundle:
+  name: capstone_lakehouse
+
+variables:
+  catalog_name:
+    description: Target Unity Catalog for medallion architecture
+    default: maven_test
+
+targets:
+  # 1. Individual developer workspace targets
+  dev:
+    mode: development
+    default: true
+    workspace:
+      root_path: ~/.bundle/${bundle.name}/${bundle.target}
+    variables:
+      catalog_name: maven_test
+
+  # 2. Main branch deployment target (CI/CD)
+  main:
+    mode: production
+    workspace:
+      root_path: /Shared/.bundle/${bundle.name}/dev
+    variables:
+      catalog_name: maven_dev
+
+  # 3. Prod branch deployment target (CI/CD)
+  prod:
+    mode: production
+    workspace:
+      root_path: /Shared/.bundle/${bundle.name}/prod
+    variables:
+      catalog_name: maven_prod
+
+# Resources section defining your workflows and pipelines
+resources:
+  jobs:
+    medallion_pipeline_job:
+      name: "[${bundle.target}] Medallion Pipeline Execution"
+      tasks:
+        - task_key: run_adls_ingestion
+          notebook_task:
+            notebook_path: adls_ingestion/Stores_ingestion.ipynb
+            base_parameters:
+              catalog: ${var.catalog_name}
