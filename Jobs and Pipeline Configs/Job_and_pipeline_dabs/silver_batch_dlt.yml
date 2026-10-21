@@ -1,0 +1,17 @@
+resources:
+  pipelines:
+    pipeline_mavenmarket_silver_kafka_dlt:
+      name: MavenMarket Silver Kafka DLT
+      clusters:
+        - label: default
+          node_type_id: Standard_D4a_v4
+          num_workers: 0
+      libraries:
+        - glob:
+            include: /Workspace/Users/reetsolanki10@gmail.com/Capstone-Project/Lakeflow
+              Declarative Pipeline/MavenMarket Silver Kafka
+              DLT/transformations/**
+      schema: silver
+      catalog: mavenmarket
+      root_path: /Workspace/Users/reetsolanki10@gmail.com/Capstone-Project/Lakeflow
+        Declarative Pipeline/MavenMarket Silver Kafka DLT
