@@ -1,19 +1,14 @@
 import pytest
-from pyspark.sql.types import StructType, StructField, IntegerType, DoubleType
 from pyspark.sql.functions import current_timestamp
 
 def test_transaction_ingestion(spark):
-    """Test transaction schema and row counts"""
-    schema = StructType([
-        StructField("transaction_id", IntegerType(), True),
-        StructField("store_id", IntegerType(), True),
-        StructField("total_amount", DoubleType(), True)
-    ])
-    
+    """Test main sales transactions"""
+    columns = ["transaction_id", "store_id", "total_amount"]
     test_data = [(50012, 1, 120.50), (50013, 2, 45.00)]
-    df = spark.createDataFrame(test_data, schema=schema)
+    df = spark.createDataFrame(test_data, columns)
+    
     df_bronze = df.withColumn("ingestion_timestamp", current_timestamp())
     
     assert df_bronze.count() == 2
-    assert "total_amount" in df_bronze.columns
+    assert "transaction_id" in df_bronze.columns
     assert "ingestion_timestamp" in df_bronze.columns
