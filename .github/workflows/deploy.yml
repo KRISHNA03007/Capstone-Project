@@ -1,49 +1,17 @@
-name: Databricks Asset Bundle Deployment
+name: Sync Code to Databricks
 
 on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
-  validate:
-    name: Validate Bundle Syntax
+  sync-repo:
+    name: Update Shared Git Folder
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
       - name: Setup Databricks CLI
         uses: databricks/setup-cli@main
-
-      - name: Validate Bundle
-        env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-        run: |
-          databricks bundle validate
-
-  deploy-main:
-    name: Deploy and Update Shared Folder
-    needs: validate
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup Databricks CLI
-        uses: databricks/setup-cli@main
-
-      - name: Deploy Bundle to Main Target
-        env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-        run: |
-          databricks bundle deploy --target main
 
       - name: Configure Git Credentials
         env:
@@ -61,7 +29,7 @@ jobs:
               --personal-access-token "${{ secrets.GIT_PAT }}"
           fi
 
-      - name: Update Shared Git Folder
+      - name: Pull Latest Code
         env:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
