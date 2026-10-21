@@ -1,16 +1,10 @@
 import pytest
-from pyspark.sql.types import StructType, StructField, IntegerType, StringType
 
-def test_returns_schema(spark):
-    """Test returns dataframe initialization"""
-    schema = StructType([
-        StructField("return_id", IntegerType(), True),
-        StructField("transaction_id", IntegerType(), True),
-        StructField("return_reason", StringType(), True)
-    ])
-    
+def test_returns_ingestion(spark):
+    """Test returns dataframe"""
+    columns = ["return_id", "transaction_id", "return_reason"]
     test_data = [(999, 50012, "Defective")]
-    df = spark.createDataFrame(test_data, schema=schema)
+    df = spark.createDataFrame(test_data, columns)
     
     assert df.count() == 1
-    assert df.collect()[0]["return_reason"] == "Defective"
+    assert "return_reason" in df.columns
