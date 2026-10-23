@@ -1,0 +1,18 @@
+resources:
+  pipelines:
+    pipeline_gold_dlt:
+      name: Gold DLT
+      clusters:
+        - label: default
+          node_type_id: Standard_D4a_v4
+          num_workers: 0
+      libraries:
+        - glob:
+            include: /Workspace/Shared/Capstone-Project-Prod/GoldLayer/MaterializedViews/**
+        - glob:
+            include: /Workspace/Shared/Capstone-Project-Prod/GoldLayer/StarSchema/DimensionTables/**
+        - glob:
+            include: /Workspace/Shared/Capstone-Project-Prod/GoldLayer/StarSchema/FactTables/**
+      schema: gold
+      catalog: mavenmarket
+      root_path: /Workspace/Shared/Capstone-Project-Prod/GoldLayer

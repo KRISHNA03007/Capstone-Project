@@ -10,7 +10,7 @@ resources:
       tasks:
         - task_key: Ingest_Customers
           notebook_task:
-            notebook_path: /Workspace/Users/ishvi101@outlook.com/Capstone-Project/mongo_ingestion/Customers
+            notebook_path: /Workspace/Shared/Capstone-Project-Prod/mongo_ingestion/Customers
             source: WORKSPACE
           job_cluster_key: Job_cluster
           libraries:
@@ -18,7 +18,7 @@ resources:
                 coordinates: org.mongodb.spark:mongo-spark-connector_2.12:10.4.0
         - task_key: Ingest_Products
           notebook_task:
-            notebook_path: /Workspace/Users/ishvi101@outlook.com/Capstone-Project/mongo_ingestion/Products
+            notebook_path: /Workspace/Shared/Capstone-Project-Prod/mongo_ingestion/Products
             source: WORKSPACE
           job_cluster_key: Job_cluster
           libraries:
@@ -26,47 +26,40 @@ resources:
                 coordinates: org.mongodb.spark:mongo-spark-connector_2.12:10.4.0
         - task_key: Ingest_Promotions
           notebook_task:
-            notebook_path: /Workspace/Users/xylorex1919@gmail.com/Capstone-Project/adls_ingestion/promotions_ingestion
+            notebook_path: /Workspace/Shared/Capstone-Project-Prod/adls_ingestion/promotions_ingestion
             source: WORKSPACE
           job_cluster_key: Job_cluster
         - task_key: Ingest_Regions
           notebook_task:
-            notebook_path: /Workspace/Users/xylorex1919@gmail.com/Capstone-Project/adls_ingestion/region_ingestion
+            notebook_path: /Workspace/Shared/Capstone-Project-Prod/adls_ingestion/region_ingestion
             source: WORKSPACE
           job_cluster_key: Job_cluster
         - task_key: Ingest_Returns
+          depends_on:
+            - task_key: Ingest_Customers
+            - task_key: Ingest_Products
           notebook_task:
-            notebook_path: /Workspace/Users/xylorex1919@gmail.com/Capstone-Project/adls_ingestion/returns_ingestion
+            notebook_path: /Workspace/Shared/Capstone-Project-Prod/adls_ingestion/returns_ingestion
             source: WORKSPACE
           job_cluster_key: Job_cluster
         - task_key: Ingest_Stores
           notebook_task:
-            notebook_path: /Workspace/Users/xylorex1919@gmail.com/Capstone-Project/adls_ingestion/Stores_ingestion
+            notebook_path: /Workspace/Shared/Capstone-Project-Prod/adls_ingestion/Stores_ingestion
             source: WORKSPACE
           job_cluster_key: Job_cluster
         - task_key: Ingest_Transactions
+          depends_on:
+            - task_key: Ingest_Customers
+            - task_key: Ingest_Products
           notebook_task:
-            notebook_path: /Workspace/Users/xylorex1919@gmail.com/Capstone-Project/adls_ingestion/transaction_ingestion
+            notebook_path: /Workspace/Shared/Capstone-Project-Prod/adls_ingestion/transaction_ingestion
             source: WORKSPACE
           job_cluster_key: Job_cluster
         - task_key: Ingest_calender
           notebook_task:
-            notebook_path: /Workspace/Users/xylorex1919@gmail.com/Capstone-Project/adls_ingestion/calender_generation
+            notebook_path: /Workspace/Shared/Capstone-Project-Prod/adls_ingestion/calender_generation
             source: WORKSPACE
           job_cluster_key: Job_cluster
-        - task_key: Triggering_Silver_DLT
-          depends_on:
-            - task_key: Ingest_calender
-            - task_key: Ingest_Customers
-            - task_key: Ingest_Products
-            - task_key: Ingest_Transactions
-            - task_key: Ingest_Returns
-            - task_key: Ingest_Promotions
-            - task_key: Ingest_Stores
-            - task_key: Ingest_Regions
-          run_if: AT_LEAST_ONE_SUCCESS
-          pipeline_task:
-            pipeline_id: 18e5e461-744e-4592-af76-c8408b4e7e9b
       job_clusters:
         - job_cluster_key: Job_cluster
           new_cluster:
@@ -79,4 +72,3 @@ resources:
             is_single_node: true
       queue:
         enabled: true
-      performance_target: PERFORMANCE_OPTIMIZED

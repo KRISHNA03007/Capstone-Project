@@ -8,12 +8,12 @@ resources:
       tasks:
         - task_key: Ingest_Kafka_Inventory
           notebook_task:
-            notebook_path: /Workspace/Users/srushtibhujade77@outlook.com/Capstone-Project/kafka_ingestion/kafka_inventory_bronze_ingestion
+            notebook_path: /Workspace/Shared/Capstone-Project-Prod/kafka_ingestion/kafka_inventory_bronze_ingestion
             source: WORKSPACE
           job_cluster_key: job_cluster
         - task_key: Ingest_Kafka_Orders
           notebook_task:
-            notebook_path: /Workspace/Users/srushtibhujade77@outlook.com/Capstone-Project/kafka_ingestion/kafka_orders_bronze_ingestion
+            notebook_path: /Workspace/Shared/Capstone-Project-Prod/kafka_ingestion/kafka_orders_bronze_ingestion
             source: WORKSPACE
           job_cluster_key: job_cluster
       job_clusters:
