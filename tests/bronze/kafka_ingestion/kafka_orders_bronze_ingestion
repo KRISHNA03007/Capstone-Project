@@ -1,0 +1,55 @@
+import pytest
+
+def test_kafka_orders_ingestion_schema_and_transformation(spark):
+    """
+    Unit test for Kafka online orders bronze ingestion:
+    1. Creates fake raw Kafka DataFrame structure (simulating orders_topic stream).
+    2. Applies the selectExpr transformation from the Databricks notebook.
+    3. Asserts row count and verifies required target bronze columns exist.
+    """
+    # 1. Create fake raw Kafka streaming data for orders_topic
+    columns = ["key", "value", "topic", "partition", "offset", "timestamp"]
+    test_data = [
+        (
+            b"order_key_1",
+            b'{"order_id": "ORD-5001", "customer_id": "CUST-101", "total_amount": 150.00}',
+            "orders_topic",
+            0,
+            2001,
+            "2026-10-23 13:00:00"
+        ),
+        (
+            b"order_key_2",
+            b'{"order_id": "ORD-5002", "customer_id": "CUST-102", "total_amount": 89.99}',
+            "orders_topic",
+            1,
+            2002,
+            "2026-10-23 13:05:00"
+        )
+    ]
+    
+    df_kafka_raw = spark.createDataFrame(test_data, columns)
+
+    # 2. Apply the exact bronze transformation logic from the ingestion notebook
+    df_bronze_orders = df_kafka_raw.selectExpr(
+        "CAST(value AS STRING) AS message_payload",
+        "topic",
+        "partition",
+        "offset",
+        "timestamp AS event_timestamp"
+    )
+
+    # 3. Asserts to verify ingestion transformation success
+    # Verify fake rows pass through without crashing
+    assert df_bronze_orders.count() == 2
+
+    # Verify all expected target bronze columns exist
+    expected_columns = [
+        "message_payload",
+        "topic",
+        "partition",
+        "offset",
+        "event_timestamp"
+    ]
+    for col_name in expected_columns:
+        assert col_name in df_bronze_orders.columns
