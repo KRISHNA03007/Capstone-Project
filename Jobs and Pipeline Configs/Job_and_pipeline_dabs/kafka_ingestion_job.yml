@@ -8,14 +8,14 @@ resources:
         - task_key: Ingest_Kafka_Inventory
           notebook_task:
             notebook_path: ../../kafka_ingestion/kafka_inventory_bronze_ingestion.ipynb
-          job_cluster_key: job_cluster
+          job_cluster_key: Job_cluster
         - task_key: Ingest_Kafka_Orders
           notebook_task:
             notebook_path: ../../kafka_ingestion/kafka_orders_bronze_ingestion.ipynb
-          job_cluster_key: job_cluster
+          job_cluster_key: Job_cluster
       job_clusters:
-      - job_cluster_key: Job_cluster
-        new_cluster:
+        - job_cluster_key: Job_cluster
+          new_cluster:
             cluster_name: ""
             spark_version: 13.3.x-scala2.12
             node_type_id: Standard_D4a_v4
