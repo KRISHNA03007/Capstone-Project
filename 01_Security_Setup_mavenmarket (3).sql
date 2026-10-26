@@ -170,9 +170,11 @@ GRANT USE CATALOG ON CATALOG mavenmarket TO `maven_mexico_west`;
 GRANT USE SCHEMA  ON SCHEMA  mavenmarket.gold TO `maven_central_west`;
 GRANT USE SCHEMA  ON SCHEMA  mavenmarket.gold TO `maven_mexico_west`;
 GRANT SELECT ON TABLE mavenmarket.gold.v_sales_secure   TO `maven_central_west`;
+GRANT SELECT ON TABLE mavenmarket.gold.v_customer_secure   TO `maven_central_west`;
 GRANT SELECT ON TABLE mavenmarket.gold.v_returns_secure TO `maven_central_west`;
 GRANT SELECT ON TABLE mavenmarket.gold.v_sales_secure   TO `maven_mexico_west`;
 GRANT SELECT ON TABLE mavenmarket.gold.v_returns_secure TO `maven_mexico_west`;
+GRANT SELECT ON TABLE mavenmarket.gold.v_customer_secure TO `maven_mexico_west`;
 
 
 -- Region group members do NOT need their own grants: they are also members of maven_regional_managers.
