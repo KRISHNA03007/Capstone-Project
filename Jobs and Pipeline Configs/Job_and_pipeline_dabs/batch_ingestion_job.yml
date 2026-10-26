@@ -10,47 +10,47 @@ resources:
       tasks:
         - task_key: Ingest_Customers
           notebook_task:
-            notebook_path: ./mongo_ingestion/Customers
+            notebook_path: ../../mongo_ingestion/Customers.ipynb
           job_cluster_key: Job_cluster
           libraries:
             - maven:
                 coordinates: org.mongodb.spark:mongo-spark-connector_2.12:10.4.0
         - task_key: Ingest_Products
           notebook_task:
-            notebook_path: ./mongo_ingestion/Products
+            notebook_path: ../../mongo_ingestion/Products.ipynb
           job_cluster_key: Job_cluster
           libraries:
             - maven:
                 coordinates: org.mongodb.spark:mongo-spark-connector_2.12:10.4.0
         - task_key: Ingest_Promotions
           notebook_task:
-            notebook_path: ./adls_ingestion/promotions_ingestion
+            notebook_path: ../../adls_ingestion/promotions_ingestion.ipynb
           job_cluster_key: Job_cluster
         - task_key: Ingest_Regions
           notebook_task:
-            notebook_path: ./adls_ingestion/region_ingestion
+            notebook_path: ../../adls_ingestion/region_ingestion.ipynb
           job_cluster_key: Job_cluster
         - task_key: Ingest_Returns
           depends_on:
             - task_key: Ingest_Customers
             - task_key: Ingest_Products
           notebook_task:
-            notebook_path: ./adls_ingestion/returns_ingestion
+            notebook_path: ../../adls_ingestion/returns_ingestion.ipynb
           job_cluster_key: Job_cluster
         - task_key: Ingest_Stores
           notebook_task:
-            notebook_path: ./adls_ingestion/Stores_ingestion
+            notebook_path: ../../adls_ingestion/Stores_ingestion.ipynb
           job_cluster_key: Job_cluster
         - task_key: Ingest_Transactions
           depends_on:
             - task_key: Ingest_Customers
             - task_key: Ingest_Products
           notebook_task:
-            notebook_path: ./adls_ingestion/transaction_ingestion
+            notebook_path: ../../adls_ingestion/transaction_ingestion.ipynb
           job_cluster_key: Job_cluster
         - task_key: Ingest_calender
           notebook_task:
-            notebook_path: ./adls_ingestion/calender_generation
+            notebook_path: ../../adls_ingestion/calender_generation.ipynb
           job_cluster_key: Job_cluster
       job_clusters:
         - job_cluster_key: Job_cluster
