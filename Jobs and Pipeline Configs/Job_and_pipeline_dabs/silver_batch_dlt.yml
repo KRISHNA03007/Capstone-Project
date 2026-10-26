@@ -6,8 +6,14 @@ resources:
         - label: default
           node_type_id: Standard_D4a_v4
           num_workers: 0
+          spark_conf:
+            spark.databricks.cluster.profile: singleNode
+            spark.master: local[*]
+          custom_tags:
+            ResourceClass: SingleNode
       libraries:
         - glob:
-            include: ./Lakeflow Declarative Pipeline/MavenMarket Silver Batch DLT/Updated Final/**
+            include: ../../Lakeflow Declarative Pipeline/MavenMarket Silver Batch DLT/Updated Final/**
       catalog: ${var.catalog_name}
       schema: silver
+

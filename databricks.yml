@@ -48,28 +48,3 @@ resources:
       file_path: ./src/maven_market_executive_agent.geniespace.json
       parent_path: /Workspace/Shared
 
-resources:
-  dashboards:
-    maven_market_analysis:
-      display_name: "Maven Market Analysis"
-      file_path: ./dashboards/Maven Market Analysis.lvdash.json
-      warehouse_id: ${var.sql_warehouse_id}
-
-    maven_market_data_quality:
-      display_name: "Maven Market - Data Quality & Governance Dashboard"
-      file_path: ./dashboards/Maven Market - Data Quality & Governance Dashboard.lvdash.json
-      warehouse_id: ${var.sql_warehouse_id}
-
-    maven_market_secure_analytics:
-      display_name: "Maven Market Secure Analytics 2"
-      file_path: ./dashboards/Maven Market Secure Analytics 2.lvdash.json
-      warehouse_id: ${var.sql_warehouse_id}
-
-  genie_spaces:
-    maven_market_executive_agent:
-      title: "Maven Market Executive Agent"
-      description: "Helps retail teams analyze sales, profit, online order performance, returns, and customer value across products, stores, regions, channels, and time."
-      warehouse_id: ${var.sql_warehouse_id}
-      file_path: ./src/maven_market_executive_agent.geniespace.json
-      parent_path: /Workspace/Shared
-

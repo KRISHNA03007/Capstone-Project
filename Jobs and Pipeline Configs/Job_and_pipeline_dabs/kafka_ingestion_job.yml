@@ -7,11 +7,11 @@ resources:
       tasks:
         - task_key: Ingest_Kafka_Inventory
           notebook_task:
-            notebook_path: ./kafka_ingestion/kafka_inventory_bronze_ingestion
+            notebook_path: ../../kafka_ingestion/kafka_inventory_bronze_ingestion.ipynb
           job_cluster_key: job_cluster
         - task_key: Ingest_Kafka_Orders
           notebook_task:
-            notebook_path: ./kafka_ingestion/kafka_orders_bronze_ingestion
+            notebook_path: ../../kafka_ingestion/kafka_orders_bronze_ingestion.ipynb
           job_cluster_key: job_cluster
       job_clusters:
         - job_cluster_key: job_cluster
@@ -24,3 +24,4 @@ resources:
             num_workers: 1
       queue:
         enabled: true
+
