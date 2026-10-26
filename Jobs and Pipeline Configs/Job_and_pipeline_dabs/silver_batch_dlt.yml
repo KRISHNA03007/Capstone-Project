@@ -8,9 +8,6 @@ resources:
           num_workers: 0
       libraries:
         - glob:
-            include: /Workspace/Shared/Capstone-Project-Prod/Lakeflow Declarative
-              Pipeline/MavenMarket Silver Batch DLT/Updated Final/**
+            include: ./Lakeflow Declarative Pipeline/MavenMarket Silver Batch DLT/Updated Final/**
+      catalog: ${var.catalog_name}
       schema: silver
-      catalog: mavenmarket
-      root_path: /Workspace/Shared/Capstone-Project-Prod/Lakeflow Declarative
-        Pipeline/MavenMarket Silver Batch DLT

@@ -8,11 +8,10 @@ resources:
           num_workers: 0
       libraries:
         - glob:
-            include: /Workspace/Shared/Capstone-Project-Prod/GoldLayer/MaterializedViews/**
+            include: ./GoldLayer/MaterializedViews/**
         - glob:
-            include: /Workspace/Shared/Capstone-Project-Prod/GoldLayer/StarSchema/DimensionTables/**
+            include: ./GoldLayer/StarSchema/DimensionTables/**
         - glob:
-            include: /Workspace/Shared/Capstone-Project-Prod/GoldLayer/StarSchema/FactTables/**
+            include: ./GoldLayer/StarSchema/FactTables/**
+      catalog: ${var.catalog_name}
       schema: gold
-      catalog: mavenmarket
-      root_path: /Workspace/Shared/Capstone-Project-Prod/GoldLayer

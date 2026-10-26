@@ -10,55 +10,47 @@ resources:
       tasks:
         - task_key: Ingest_Customers
           notebook_task:
-            notebook_path: /Workspace/Shared/Capstone-Project-Prod/mongo_ingestion/Customers
-            source: WORKSPACE
+            notebook_path: ./mongo_ingestion/Customers
           job_cluster_key: Job_cluster
           libraries:
             - maven:
                 coordinates: org.mongodb.spark:mongo-spark-connector_2.12:10.4.0
         - task_key: Ingest_Products
           notebook_task:
-            notebook_path: /Workspace/Shared/Capstone-Project-Prod/mongo_ingestion/Products
-            source: WORKSPACE
+            notebook_path: ./mongo_ingestion/Products
           job_cluster_key: Job_cluster
           libraries:
             - maven:
                 coordinates: org.mongodb.spark:mongo-spark-connector_2.12:10.4.0
         - task_key: Ingest_Promotions
           notebook_task:
-            notebook_path: /Workspace/Shared/Capstone-Project-Prod/adls_ingestion/promotions_ingestion
-            source: WORKSPACE
+            notebook_path: ./adls_ingestion/promotions_ingestion
           job_cluster_key: Job_cluster
         - task_key: Ingest_Regions
           notebook_task:
-            notebook_path: /Workspace/Shared/Capstone-Project-Prod/adls_ingestion/region_ingestion
-            source: WORKSPACE
+            notebook_path: ./adls_ingestion/region_ingestion
           job_cluster_key: Job_cluster
         - task_key: Ingest_Returns
           depends_on:
             - task_key: Ingest_Customers
             - task_key: Ingest_Products
           notebook_task:
-            notebook_path: /Workspace/Shared/Capstone-Project-Prod/adls_ingestion/returns_ingestion
-            source: WORKSPACE
+            notebook_path: ./adls_ingestion/returns_ingestion
           job_cluster_key: Job_cluster
         - task_key: Ingest_Stores
           notebook_task:
-            notebook_path: /Workspace/Shared/Capstone-Project-Prod/adls_ingestion/Stores_ingestion
-            source: WORKSPACE
+            notebook_path: ./adls_ingestion/Stores_ingestion
           job_cluster_key: Job_cluster
         - task_key: Ingest_Transactions
           depends_on:
             - task_key: Ingest_Customers
             - task_key: Ingest_Products
           notebook_task:
-            notebook_path: /Workspace/Shared/Capstone-Project-Prod/adls_ingestion/transaction_ingestion
-            source: WORKSPACE
+            notebook_path: ./adls_ingestion/transaction_ingestion
           job_cluster_key: Job_cluster
         - task_key: Ingest_calender
           notebook_task:
-            notebook_path: /Workspace/Shared/Capstone-Project-Prod/adls_ingestion/calender_generation
-            source: WORKSPACE
+            notebook_path: ./adls_ingestion/calender_generation
           job_cluster_key: Job_cluster
       job_clusters:
         - job_cluster_key: Job_cluster
@@ -66,9 +58,8 @@ resources:
             cluster_name: ""
             spark_version: 13.3.x-scala2.12
             node_type_id: Standard_D4a_v4
-            data_security_mode: DATA_SECURITY_MODE_DEDICATED
+            data_security_mode: SINGLE_USER
             runtime_engine: STANDARD
-            kind: CLASSIC_PREVIEW
-            is_single_node: true
+            num_workers: 1
       queue:
         enabled: true

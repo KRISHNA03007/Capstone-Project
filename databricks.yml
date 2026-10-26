@@ -4,229 +4,72 @@ bundle:
 variables:
   catalog_name:
     description: Target Unity Catalog for medallion architecture
-    default: maven_test
+    default: mavenmarket
 
-  # Cluster node type used across all jobs and DLT pipelines
-  node_type_id:
-    description: VM node type for all job and pipeline clusters
-    default: "Standard_D4a_v4"
+  sql_warehouse_id:
+    description: Databricks SQL Warehouse ID for Genie space and Dashboards
+    default: "35cc87a5d9ff97c9"
 
-  # Spark runtime versions per workload
-  batch_spark_version:
-    description: Spark version for batch ingestion job cluster
-    default: "13.3.x-scala2.12"
-
-  kafka_spark_version:
-    description: Spark version for Kafka ingestion job cluster
-    default: "14.3.x-scala2.12"
+include:
+  - "Jobs and Pipeline Configs/Job_and_pipeline_dabs/*.yml"
 
 targets:
-  # 1. Individual developer workspace targets
-  dev:
-    mode: development
-    default: true
-    workspace:
-      root_path: ~/.bundle/${bundle.name}/${bundle.target}
-    variables:
-      catalog_name: maven_test
-
-  # 2. Main branch deployment target (CI/CD)
-  main:
-    mode: production
-    workspace:
-      root_path: /Shared/.bundle/${bundle.name}/dev
-    variables:
-      catalog_name: maven_dev
-
-  # 3. Prod branch deployment target (CI/CD)
   prod:
     mode: production
+    default: true
     workspace:
       root_path: /Shared/.bundle/${bundle.name}/prod
     variables:
-      catalog_name: maven_prod
+      catalog_name: mavenmarket
+      sql_warehouse_id: "35cc87a5d9ff97c9"
 
-# Resources section defining your workflows and pipelines
 resources:
-
-  # ─────────────────────────────────────────────────────────────────
-  # JOBS
-  # ─────────────────────────────────────────────────────────────────
-  jobs:
-
-    # Existing medallion orchestration job
-    medallion_pipeline_job:
-      name: "[${bundle.target}] Medallion Pipeline Execution"
-      tasks:
-        - task_key: run_adls_ingestion
-          notebook_task:
-            notebook_path: adls_ingestion/Stores_ingestion.ipynb
-            base_parameters:
-              catalog: ${var.catalog_name}
-
-    # ── Batch Ingestion Job ─────────────────────────────────────────
-    Batch_Ingestion_Job:
-      name: "Batch Ingestion Job"
-      trigger:
-        pause_status: UNPAUSED
-        periodic:
-          interval: 1
-          unit: DAYS
-      tasks:
-        - task_key: Ingest_Customers
-          notebook_task:
-            notebook_path: /Workspace/${workspace.root_path}/mongo_ingestion/Customers
-            source: WORKSPACE
-          job_cluster_key: Job_cluster
-          libraries:
-            - maven:
-                coordinates: org.mongodb.spark:mongo-spark-connector_2.12:10.4.0  # HARDCODED - see note
-        - task_key: Ingest_Products
-          notebook_task:
-            notebook_path: /Workspace/${workspace.root_path}/mongo_ingestion/Products
-            source: WORKSPACE
-          job_cluster_key: Job_cluster
-          libraries:
-            - maven:
-                coordinates: org.mongodb.spark:mongo-spark-connector_2.12:10.4.0  # HARDCODED - see note
-        - task_key: Ingest_Promotions
-          notebook_task:
-            notebook_path: /Workspace/${workspace.root_path}/adls_ingestion/promotions_ingestion
-            source: WORKSPACE
-          job_cluster_key: Job_cluster
-        - task_key: Ingest_Regions
-          notebook_task:
-            notebook_path: /Workspace/${workspace.root_path}/adls_ingestion/region_ingestion
-            source: WORKSPACE
-          job_cluster_key: Job_cluster
-        - task_key: Ingest_Returns
-          depends_on:
-            - task_key: Ingest_Customers
-            - task_key: Ingest_Products
-          notebook_task:
-            notebook_path: /Workspace/${workspace.root_path}/adls_ingestion/returns_ingestion
-            source: WORKSPACE
-          job_cluster_key: Job_cluster
-        - task_key: Ingest_Stores
-          notebook_task:
-            notebook_path: /Workspace/${workspace.root_path}/adls_ingestion/Stores_ingestion
-            source: WORKSPACE
-          job_cluster_key: Job_cluster
-        - task_key: Ingest_Transactions
-          depends_on:
-            - task_key: Ingest_Customers
-            - task_key: Ingest_Products
-          notebook_task:
-            notebook_path: /Workspace/${workspace.root_path}/adls_ingestion/transaction_ingestion
-            source: WORKSPACE
-          job_cluster_key: Job_cluster
-        - task_key: Ingest_calender
-          notebook_task:
-            notebook_path: /Workspace/${workspace.root_path}/adls_ingestion/calender_generation
-            source: WORKSPACE
-          job_cluster_key: Job_cluster
-      job_clusters:
-        - job_cluster_key: Job_cluster
-          new_cluster:
-            cluster_name: ""
-            spark_version: ${var.batch_spark_version}
-            node_type_id: ${var.node_type_id}
-            data_security_mode: DATA_SECURITY_MODE_DEDICATED  # HARDCODED - see note
-            runtime_engine: STANDARD                           # HARDCODED - see note
-            kind: CLASSIC_PREVIEW                              # HARDCODED - see note
-            is_single_node: true
-      queue:
-        enabled: true
-
-    # ── Kafka Ingestion Job ─────────────────────────────────────────
-    Kafka_Ingestion_Job:
-      name: "Kafka Ingestion Job"
-      continuous:
-        pause_status: PAUSED        # HARDCODED - see note
-        task_retry_mode: ON_FAILURE # HARDCODED - see note
-      tasks:
-        - task_key: Ingest_Kafka_Inventory
-          notebook_task:
-            notebook_path: /Workspace/${workspace.root_path}/kafka_ingestion/kafka_inventory_bronze_ingestion
-            source: WORKSPACE
-          job_cluster_key: job_cluster
-        - task_key: Ingest_Kafka_Orders
-          notebook_task:
-            notebook_path: /Workspace/${workspace.root_path}/kafka_ingestion/kafka_orders_bronze_ingestion
-            source: WORKSPACE
-          job_cluster_key: job_cluster
-      job_clusters:
-        - job_cluster_key: job_cluster
-          new_cluster:
-            cluster_name: ""
-            spark_version: ${var.kafka_spark_version}
-            node_type_id: ${var.node_type_id}
-            data_security_mode: DATA_SECURITY_MODE_AUTO # HARDCODED - see note
-            runtime_engine: STANDARD                    # HARDCODED - see note
-            kind: CLASSIC_PREVIEW                       # HARDCODED - see note
-            use_ml_runtime: false
-            is_single_node: true
-      queue:
-        enabled: true
-
-  # ─────────────────────────────────────────────────────────────────
-  # PIPELINES  (Lakeflow Declarative / DLT)
-  # ─────────────────────────────────────────────────────────────────
-  pipelines:
-
-    # ── Silver Batch DLT ───────────────────────────────────────────
-    pipeline_silver_batch_dlt:
-      name: "Silver Batch DLT"
-      clusters:
-        - label: default
-          node_type_id: ${var.node_type_id}
-          num_workers: 0  # HARDCODED - see note
-      libraries:
-        - glob:
-            include: ./Lakeflow Declarative Pipeline/MavenMarket Silver Batch DLT/Updated Final/**
-      schema: silver
-      catalog: mavenmarket  # HARDCODED - see note
-
-    # ── Gold DLT ───────────────────────────────────────────────────
-    pipeline_gold_dlt:
-      name: "Gold DLT"
-      clusters:
-        - label: default
-          node_type_id: ${var.node_type_id}
-          num_workers: 0  # HARDCODED - see note
-      libraries:
-        - glob:
-            include: ./GoldLayer/MaterializedViews/**
-        - glob:
-            include: ./GoldLayer/StarSchema/DimensionTables/**
-        - glob:
-            include: ./GoldLayer/StarSchema/FactTables/**
-      schema: gold
-      catalog: mavenmarket  # HARDCODED - see note
-
-  # ─────────────────────────────────────────────────────────────────
-  # DASHBOARDS  (Lakeview)
-  # ─────────────────────────────────────────────────────────────────
   dashboards:
     maven_market_analysis:
       display_name: "Maven Market Analysis"
       file_path: ./dashboards/Maven Market Analysis.lvdash.json
+      warehouse_id: ${var.sql_warehouse_id}
 
     maven_market_data_quality:
       display_name: "Maven Market - Data Quality & Governance Dashboard"
       file_path: ./dashboards/Maven Market - Data Quality & Governance Dashboard.lvdash.json
+      warehouse_id: ${var.sql_warehouse_id}
 
     maven_market_secure_analytics:
       display_name: "Maven Market Secure Analytics 2"
       file_path: ./dashboards/Maven Market Secure Analytics 2.lvdash.json
+      warehouse_id: ${var.sql_warehouse_id}
 
-  # ─────────────────────────────────────────────────────────────────
-  # GENIE SPACES
-  # ─────────────────────────────────────────────────────────────────
   genie_spaces:
     maven_market_executive_agent:
       title: "Maven Market Executive Agent"
       description: "Helps retail teams analyze sales, profit, online order performance, returns, and customer value across products, stores, regions, channels, and time."
-      warehouse_id: 35cc87a5d9ff97c9  # HARDCODED - SQL warehouse ID from the workspace
+      warehouse_id: ${var.sql_warehouse_id}
       file_path: ./src/maven_market_executive_agent.geniespace.json
       parent_path: /Workspace/Shared
+
+resources:
+  dashboards:
+    maven_market_analysis:
+      display_name: "Maven Market Analysis"
+      file_path: ./dashboards/Maven Market Analysis.lvdash.json
+      warehouse_id: ${var.sql_warehouse_id}
+
+    maven_market_data_quality:
+      display_name: "Maven Market - Data Quality & Governance Dashboard"
+      file_path: ./dashboards/Maven Market - Data Quality & Governance Dashboard.lvdash.json
+      warehouse_id: ${var.sql_warehouse_id}
+
+    maven_market_secure_analytics:
+      display_name: "Maven Market Secure Analytics 2"
+      file_path: ./dashboards/Maven Market Secure Analytics 2.lvdash.json
+      warehouse_id: ${var.sql_warehouse_id}
+
+  genie_spaces:
+    maven_market_executive_agent:
+      title: "Maven Market Executive Agent"
+      description: "Helps retail teams analyze sales, profit, online order performance, returns, and customer value across products, stores, regions, channels, and time."
+      warehouse_id: ${var.sql_warehouse_id}
+      file_path: ./src/maven_market_executive_agent.geniespace.json
+      parent_path: /Workspace/Shared
+
