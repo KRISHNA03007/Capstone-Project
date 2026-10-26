@@ -4,17 +4,14 @@ resources:
       name: Kafka Ingestion Job
       continuous:
         pause_status: PAUSED
-        task_retry_mode: ON_FAILURE
       tasks:
         - task_key: Ingest_Kafka_Inventory
           notebook_task:
-            notebook_path: /Workspace/Shared/Capstone-Project-Prod/kafka_ingestion/kafka_inventory_bronze_ingestion
-            source: WORKSPACE
+            notebook_path: ./kafka_ingestion/kafka_inventory_bronze_ingestion
           job_cluster_key: job_cluster
         - task_key: Ingest_Kafka_Orders
           notebook_task:
-            notebook_path: /Workspace/Shared/Capstone-Project-Prod/kafka_ingestion/kafka_orders_bronze_ingestion
-            source: WORKSPACE
+            notebook_path: ./kafka_ingestion/kafka_orders_bronze_ingestion
           job_cluster_key: job_cluster
       job_clusters:
         - job_cluster_key: job_cluster
@@ -22,10 +19,8 @@ resources:
             cluster_name: ""
             spark_version: 14.3.x-scala2.12
             node_type_id: Standard_D4a_v4
-            data_security_mode: DATA_SECURITY_MODE_AUTO
+            data_security_mode: SINGLE_USER
             runtime_engine: STANDARD
-            kind: CLASSIC_PREVIEW
-            use_ml_runtime: false
-            is_single_node: true
+            num_workers: 1
       queue:
         enabled: true

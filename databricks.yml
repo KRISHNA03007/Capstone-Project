@@ -4,52 +4,16 @@ bundle:
 variables:
   catalog_name:
     description: Target Unity Catalog for medallion architecture
-    default: maven_test
+    default: mavenmarket
 
 include:
   - "Jobs and Pipeline Configs/Job_and_pipeline_dabs/*.yml"
 
 targets:
-  dev:
-    mode: development
-    default: true
-    workspace:
-      root_path: ~/.bundle/${bundle.name}/${bundle.target}
-    variables:
-      catalog_name: maven_test
-
-  main:
-    mode: production
-    workspace:
-      root_path: /Shared/.bundle/${bundle.name}/dev
-    variables:
-      catalog_name: maven_dev
-
   prod:
     mode: production
+    default: true
     workspace:
       root_path: /Shared/.bundle/${bundle.name}/prod
     variables:
-      catalog_name: maven_prod
-
-# resources:
-#   dashboards:
-#     maven_market_analysis:
-#       display_name: "Maven Market Analysis"
-#       file_path: ./dashboards/Maven Market Analysis.lvdash.json
-
-#     maven_market_data_quality:
-#       display_name: "Maven Market - Data Quality & Governance Dashboard"
-#       file_path: ./dashboards/Maven Market - Data Quality & Governance Dashboard.lvdash.json
-
-#     maven_market_secure_analytics:
-#       display_name: "Maven Market Secure Analytics 2"
-#       file_path: ./dashboards/Maven Market Secure Analytics 2.lvdash.json
-
-#   genie_spaces:
-#     maven_market_executive_agent:
-#       title: "Maven Market Executive Agent"
-#       description: "Helps retail teams analyze sales, profit, online order performance, returns, and customer value across products, stores, regions, channels, and time."
-#       warehouse_id: 35cc87a5d9ff97c9
-#       file_path: ./src/maven_market_executive_agent.geniespace.json
-#       parent_path: /Workspace/Shared
+      catalog_name: mavenmarket
