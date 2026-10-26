@@ -1,0 +1,938 @@
+{
+  "datasets": [
+    {
+      "name": "6b91fb08",
+      "displayName": "User Access and Region Overview",
+      "queryLines": [
+        "SELECT current_user() AS viewer,\n",
+        "       CASE WHEN is_member('maven_dataengineer') THEN 'Data Engineer (full access)'\n",
+        "            WHEN is_member('maven_executives')   THEN 'Executive (all regions, profit visible)'\n",
+        "            WHEN is_member('maven_analysts')     THEN 'Analyst (all regions, profit hidden)'\n",
+        "            WHEN is_member('maven_regional_managers') THEN 'Regional Manager (own region only)'\n",
+        "            ELSE 'No persona' END AS persona,\n",
+        "       CASE WHEN is_member('maven_central_west') THEN 'Central West'\n",
+        "            WHEN is_member('maven_mexico_west')  THEN 'Mexico West'\n",
+        "            WHEN is_member('maven_dataengineer')\n",
+        "              OR is_member('maven_executives')\n",
+        "              OR is_member('maven_analysts')     THEN 'All regions'\n",
+        "            ELSE 'None' END AS region_scope"
+      ]
+    },
+    {
+      "name": "b3eb2803",
+      "displayName": "Untitled dataset",
+      "queryLines": [
+        ""
+      ]
+    },
+    {
+      "name": "1edf4b98",
+      "displayName": "viewer_info",
+      "queryLines": [
+        "SELECT current_user() AS viewer,\n",
+        "       CASE WHEN is_account_group_member('maven_dataengineer') THEN 'Data Engineer (full access)'\n",
+        "            WHEN is_account_group_member('maven_executives')   THEN 'Executive (all regions, profit visible)'\n",
+        "            WHEN is_account_group_member('maven_analysts')     THEN 'Analyst (all regions, profit hidden)'\n",
+        "            WHEN is_account_group_member('maven_regional_managers') THEN 'Regional Manager (own region only)'\n",
+        "            ELSE 'No persona' END AS persona,\n",
+        "       CASE WHEN is_account_group_member('maven_central_west') THEN 'Central West'\n",
+        "            WHEN is_account_group_member('maven_mexico_west')  THEN 'Mexico West'\n",
+        "            WHEN is_account_group_member('maven_dataengineer')\n",
+        "              OR is_account_group_member('maven_executives')\n",
+        "              OR is_account_group_member('maven_analysts')     THEN 'All regions'\n",
+        "            ELSE 'None' END AS region_scope"
+      ]
+    },
+    {
+      "name": "efa5db33",
+      "displayName": "kpi_summary",
+      "queryLines": [
+        "SELECT SUM(gross_revenue_amount) AS revenue,\n",
+        "       SUM(sales_quantity) AS units_sold,\n",
+        "       SUM(gross_profit_amount) AS profit,\n",
+        "       COUNT(DISTINCT store_id) AS stores\n",
+        "FROM mavenmarket.gold.v_sales_secure"
+      ]
+    },
+    {
+      "name": "2e8b4283",
+      "displayName": "revenue_by_month",
+      "queryLines": [
+        "SELECT year_month_code,\n",
+        "       SUM(gross_revenue_amount) AS revenue,\n",
+        "       SUM(gross_profit_amount) AS profit\n",
+        "FROM mavenmarket.gold.v_sales_secure\n",
+        "GROUP BY year_month_code\n",
+        "ORDER BY year_month_code"
+      ]
+    },
+    {
+      "name": "7dc15ec2",
+      "displayName": "revenue_by_region",
+      "queryLines": [
+        "SELECT sales_region,\n",
+        "       SUM(gross_revenue_amount) AS revenue,\n",
+        "       SUM(gross_profit_amount) AS profit,\n",
+        "       SUM(sales_quantity) AS units_sold\n",
+        "FROM mavenmarket.gold.v_sales_secure\n",
+        "GROUP BY sales_region\n",
+        "ORDER BY revenue DESC"
+      ]
+    },
+    {
+      "name": "17b0b614",
+      "displayName": "top stores",
+      "queryLines": [
+        "SELECT store_name,\n",
+        "       sales_region,\n",
+        "       SUM(gross_revenue_amount) AS revenue\n",
+        "FROM mavenmarket.gold.v_sales_secure\n",
+        "GROUP BY store_name, sales_region\n",
+        "ORDER BY revenue DESC\n",
+        "LIMIT 15"
+      ]
+    },
+    {
+      "name": "b726e9f2",
+      "displayName": "Untitled dataset 1",
+      "queryLines": [
+        ""
+      ]
+    },
+    {
+      "name": "2a60323e",
+      "displayName": "category_performance",
+      "queryLines": [
+        "SELECT category_name,\n",
+        "       SUM(gross_revenue_amount) AS revenue,\n",
+        "       SUM(sales_quantity)       AS units_sold\n",
+        "FROM mavenmarket.gold.v_sales_secure\n",
+        "GROUP BY category_name\n",
+        "ORDER BY revenue DESC"
+      ]
+    },
+    {
+      "name": "0eaee8c8",
+      "displayName": "returns_by_month",
+      "queryLines": [
+        "SELECT year_month_code,\n",
+        "       SUM(return_quantity) AS units_returned\n",
+        "FROM mavenmarket.gold.v_returns_secure\n",
+        "GROUP BY year_month_code\n",
+        "ORDER BY year_month_code"
+      ]
+    },
+    {
+      "name": "a9288535",
+      "displayName": "returns_by_region",
+      "queryLines": [
+        "SELECT sales_region,\n",
+        "       SUM(return_quantity) AS units_returned\n",
+        "FROM mavenmarket.gold.v_returns_secure\n",
+        "GROUP BY sales_region\n",
+        "ORDER BY units_returned DESC\n"
+      ]
+    },
+    {
+      "name": "bc23b289",
+      "displayName": "customer_masked",
+      "queryLines": [
+        "SELECT customer_id, full_name, birth_date, street_address, city_name,\n",
+        "       country_name, occupation_name, yearly_income_range\n",
+        "FROM mavenmarket.gold.v_customer_secure\n",
+        "WHERE is_current_flag\n",
+        "LIMIT 50"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "4a1d47b2",
+      "displayName": "Untitled page",
+      "layout": [
+        {
+          "widget": {
+            "name": "5a120d5f",
+            "multilineTextboxSpec": {
+              "lines": [
+                ""
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "user",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "1edf4b98",
+                  "fields": [
+                    {
+                      "name": "viewer",
+                      "expression": "`viewer`"
+                    },
+                    {
+                      "name": "persona",
+                      "expression": "`persona`"
+                    },
+                    {
+                      "name": "region_scope",
+                      "expression": "`region_scope`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showDescription": false,
+                "showTitle": true,
+                "title": {
+                  "value": "viewer details",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "viewer"
+                  },
+                  {
+                    "fieldName": "persona"
+                  },
+                  {
+                    "fieldName": "region_scope"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 1,
+            "width": 12,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "revenue",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "efa5db33",
+                  "fields": [
+                    {
+                      "name": "sum(revenue)",
+                      "expression": "SUM(`revenue`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Revenue",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(revenue)"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 3,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "unit-sold",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "efa5db33",
+                  "fields": [
+                    {
+                      "name": "sum(units_sold)",
+                      "expression": "SUM(`units_sold`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "unit\\_sold",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(units_sold)"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 3,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "profit",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "efa5db33",
+                  "fields": [
+                    {
+                      "name": "sum(profit)",
+                      "expression": "SUM(`profit`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "profit",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(profit)"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 3,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "stores",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "efa5db33",
+                  "fields": [
+                    {
+                      "name": "sum(stores)",
+                      "expression": "SUM(`stores`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "stores",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(stores)"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 9,
+            "y": 3,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "revenue-trend",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "2e8b4283",
+                  "fields": [
+                    {
+                      "name": "year_month_code",
+                      "expression": "`year_month_code`"
+                    },
+                    {
+                      "name": "sum(revenue)",
+                      "expression": "SUM(`revenue`)"
+                    },
+                    {
+                      "name": "sum(profit)",
+                      "expression": "SUM(`profit`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Revenue Trend",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "year_month_code",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "fields": [
+                    {
+                      "fieldName": "sum(revenue)"
+                    },
+                    {
+                      "fieldName": "sum(profit)"
+                    }
+                  ]
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 11,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "revenue-by-region-1",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "7dc15ec2",
+                  "fields": [
+                    {
+                      "name": "sales_region",
+                      "expression": "`sales_region`"
+                    },
+                    {
+                      "name": "sum(revenue)",
+                      "expression": "SUM(`revenue`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Revenue by Region",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "sales_region",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(revenue)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 17,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "top-stores-1",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "17b0b614",
+                  "fields": [
+                    {
+                      "name": "store_name",
+                      "expression": "`store_name`"
+                    },
+                    {
+                      "name": "sum(revenue)",
+                      "expression": "SUM(`revenue`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Top Stores",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "store_name",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(revenue)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 11,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "category-performance",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "2a60323e",
+                  "fields": [
+                    {
+                      "name": "category_name",
+                      "expression": "`category_name`"
+                    },
+                    {
+                      "name": "sum(revenue)",
+                      "expression": "SUM(`revenue`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Category Performance",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "category_name",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(revenue)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 17,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "returns-by-month",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "0eaee8c8",
+                  "fields": [
+                    {
+                      "name": "year_month_code",
+                      "expression": "`year_month_code`"
+                    },
+                    {
+                      "name": "sum(units_returned)",
+                      "expression": "SUM(`units_returned`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Returns by Month",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "year_month_code",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(units_returned)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 23,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "customer-details",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "bc23b289",
+                  "fields": [
+                    {
+                      "name": "customer_id",
+                      "expression": "`customer_id`"
+                    },
+                    {
+                      "name": "full_name",
+                      "expression": "`full_name`"
+                    },
+                    {
+                      "name": "birth_date",
+                      "expression": "`birth_date`"
+                    },
+                    {
+                      "name": "street_address",
+                      "expression": "`street_address`"
+                    },
+                    {
+                      "name": "city_name",
+                      "expression": "`city_name`"
+                    },
+                    {
+                      "name": "country_name",
+                      "expression": "`country_name`"
+                    },
+                    {
+                      "name": "occupation_name",
+                      "expression": "`occupation_name`"
+                    },
+                    {
+                      "name": "yearly_income_range",
+                      "expression": "`yearly_income_range`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Customer Details",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "customer_id"
+                  },
+                  {
+                    "fieldName": "full_name"
+                  },
+                  {
+                    "fieldName": "birth_date"
+                  },
+                  {
+                    "fieldName": "street_address"
+                  },
+                  {
+                    "fieldName": "city_name"
+                  },
+                  {
+                    "fieldName": "country_name"
+                  },
+                  {
+                    "fieldName": "occupation_name"
+                  },
+                  {
+                    "fieldName": "yearly_income_range"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 29,
+            "width": 12,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "units-sold-by-region",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "7dc15ec2",
+                  "fields": [
+                    {
+                      "name": "sales_region",
+                      "expression": "`sales_region`"
+                    },
+                    {
+                      "name": "sum(units_sold)",
+                      "expression": "SUM(`units_sold`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Units Sold by Region",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "sales_region",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(units_sold)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 23,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "region-wise-store-performance-1",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "17b0b614",
+                  "fields": [
+                    {
+                      "name": "store_name",
+                      "expression": "`store_name`"
+                    },
+                    {
+                      "name": "sales_region",
+                      "expression": "`sales_region`"
+                    },
+                    {
+                      "name": "revenue",
+                      "expression": "`revenue`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Region wise store performance",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "store_name"
+                  },
+                  {
+                    "fieldName": "sales_region"
+                  },
+                  {
+                    "fieldName": "revenue"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 6,
+            "width": 12,
+            "height": 5
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "applyModeEnabled": false
+  }
+}

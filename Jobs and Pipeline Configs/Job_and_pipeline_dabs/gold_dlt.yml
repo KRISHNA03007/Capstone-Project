@@ -20,3 +20,4 @@ resources:
             include: ../../GoldLayer/StarSchema/FactTables/**
       catalog: ${var.catalog_name}
       schema: gold
+

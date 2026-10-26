@@ -1,0 +1,919 @@
+{
+  "datasets": [
+    {
+      "name": "dq_incidents",
+      "displayName": "DQ Incidents (Quarantine Checks)",
+      "config": {
+        "source": "WITH q AS (\n  SELECT 'customers' AS entity, 'mavenmarket.silver.quarantine_customers' AS quarantine_table, CAST(_ingestion_timestamp AS TIMESTAMP) AS detected_at, CAST(_ingestion_timestamp AS DATE) AS record_date, quarantine_reasons FROM mavenmarket.silver.quarantine_customers\n  UNION ALL SELECT 'stores', 'mavenmarket.silver.quarantine_stores', ingested_timestamp, CAST(ingested_timestamp AS DATE), quarantine_reasons FROM mavenmarket.silver.quarantine_stores\n  UNION ALL SELECT 'transactions', 'mavenmarket.silver.quarantine_transactions', ingested_timestamp, CAST(transaction_date AS DATE), quarantine_reasons FROM mavenmarket.silver.quarantine_transactions\n  UNION ALL SELECT 'returns', 'mavenmarket.silver.quarantine_returns', ingested_timestamp, CAST(return_date AS DATE), quarantine_reasons FROM mavenmarket.silver.quarantine_returns\n  UNION ALL SELECT 'inventory', 'mavenmarket.silver.quarantine_inventory', _ingestion_timestamp, CAST(restock_date AS DATE), quarantine_reasons FROM mavenmarket.silver.quarantine_inventory\n  UNION ALL SELECT 'products', 'mavenmarket.silver.quarantine_products', _ingestion_timestamp, CAST(_ingestion_timestamp AS DATE), quarantine_reasons FROM mavenmarket.silver.quarantine_products\n  UNION ALL SELECT 'promotions', 'mavenmarket.silver.quarantine_promotions', ingested_timestamp, CAST(ingested_timestamp AS DATE), quarantine_reasons FROM mavenmarket.silver.quarantine_promotions\n  UNION ALL SELECT 'regions', 'mavenmarket.silver.quarantine_regions', ingested_timestamp, CAST(ingested_timestamp AS DATE), quarantine_reasons FROM mavenmarket.silver.quarantine_regions\n  UNION ALL SELECT 'calendar', 'mavenmarket.silver.quarantine_calendar', _ingestion_timestamp, CAST(_ingestion_timestamp AS DATE), quarantine_reasons FROM mavenmarket.silver.quarantine_calendar\n)\nSELECT entity, quarantine_table, detected_at, record_date, TRIM(chk) AS failed_check\nFROM q LATERAL VIEW EXPLODE(SPLIT(COALESCE(quarantine_reasons, 'Unknown: unspecified'), ';')) t AS chk\nWHERE TRIM(chk) <> '' AND DATE(detected_at) = (SELECT MAX(DATE(detected_at)) FROM (SELECT CAST(_ingestion_timestamp AS DATE) AS detected_at FROM mavenmarket.silver.quarantine_customers UNION ALL SELECT CAST(ingested_timestamp AS DATE) FROM mavenmarket.silver.quarantine_stores UNION ALL SELECT CAST(ingested_timestamp AS DATE) FROM mavenmarket.silver.quarantine_transactions UNION ALL SELECT CAST(ingested_timestamp AS DATE) FROM mavenmarket.silver.quarantine_returns UNION ALL SELECT CAST(_ingestion_timestamp AS DATE) FROM mavenmarket.silver.quarantine_inventory UNION ALL SELECT CAST(_ingestion_timestamp AS DATE) FROM mavenmarket.silver.quarantine_products UNION ALL SELECT CAST(ingested_timestamp AS DATE) FROM mavenmarket.silver.quarantine_promotions UNION ALL SELECT CAST(ingested_timestamp AS DATE) FROM mavenmarket.silver.quarantine_regions UNION ALL SELECT CAST(_ingestion_timestamp AS DATE) FROM mavenmarket.silver.quarantine_calendar))",
+        "measures": [
+          {
+            "name": "failed_checks",
+            "displayName": "Failed Checks",
+            "expr": "COUNT(1)"
+          },
+          {
+            "name": "affected_sources",
+            "displayName": "Affected Sources",
+            "expr": "COUNT(DISTINCT entity)"
+          },
+          {
+            "name": "last_detected",
+            "displayName": "Last Detected",
+            "expr": "MAX(detected_at)"
+          },
+          {
+            "name": "last_record_date",
+            "displayName": "Latest Record Date",
+            "expr": "MAX(record_date)"
+          }
+        ],
+        "version": "1.1",
+        "comment": "Failed hard checks exploded from all silver quarantine tables",
+        "dimensions": [
+          {
+            "expr": "entity",
+            "displayName": "Entity"
+          },
+          {
+            "expr": "quarantine_table",
+            "displayName": "Quarantine Table"
+          },
+          {
+            "expr": "detected_at",
+            "displayName": "Detected At"
+          },
+          {
+            "expr": "record_date",
+            "displayName": "Record Date"
+          },
+          {
+            "expr": "failed_check",
+            "displayName": "Failed Check"
+          },
+          {
+            "name": "check_category",
+            "displayName": "Check Category",
+            "expr": "TRIM(SPLIT(failed_check, ':')[0])"
+          },
+          {
+            "name": "record_month",
+            "displayName": "Record Month",
+            "expr": "DATE_TRUNC('MONTH', record_date)"
+          }
+        ]
+      }
+    },
+    {
+      "name": "dq_scorecard",
+      "displayName": "DQ Scorecard Metrics",
+      "config": {
+        "version": "1.1",
+        "source": "SELECT * FROM mavenmarket.silver.dq_metrics\nWHERE run_time = (SELECT MAX(run_time) FROM mavenmarket.silver.dq_metrics)\nQUALIFY ROW_NUMBER() OVER (PARTITION BY table_name ORDER BY run_time DESC) = 1",
+        "dimensions": [
+          {
+            "expr": "table_name",
+            "displayName": "Entity"
+          },
+          {
+            "expr": "run_time",
+            "displayName": "Run Time"
+          },
+          {
+            "expr": "failure_percentage",
+            "displayName": "Failure %"
+          },
+          {
+            "name": "health_status",
+            "displayName": "Health Status",
+            "expr": "CASE WHEN failure_percentage >= 10 THEN '3 - Critical'\n     WHEN failure_percentage >= 1 OR warn_failed_records > 0 THEN '2 - Elevated'\n     ELSE '1 - Healthy' END"
+          }
+        ],
+        "measures": [
+          {
+            "name": "records_checked",
+            "displayName": "Records Checked",
+            "expr": "SUM(records_checked)"
+          },
+          {
+            "name": "hard_failures",
+            "displayName": "Hard Failures",
+            "expr": "SUM(hard_failed_records)"
+          },
+          {
+            "name": "soft_warnings",
+            "displayName": "Soft Warnings",
+            "expr": "SUM(warn_failed_records)"
+          },
+          {
+            "name": "quality_score",
+            "displayName": "Quality Score",
+            "expr": "1 - SUM(hard_failed_records) / NULLIF(SUM(records_checked), 0)",
+            "format": {
+              "type": "percentage",
+              "decimalPlaces": {
+                "type": "exact",
+                "places": 2.0
+              }
+            }
+          },
+          {
+            "name": "warning_rate",
+            "displayName": "Warning Rate",
+            "expr": "SUM(warn_failed_records) / NULLIF(SUM(records_checked), 0)",
+            "format": {
+              "type": "percentage",
+              "decimalPlaces": {
+                "type": "exact",
+                "places": 3.0
+              }
+            }
+          },
+          {
+            "name": "failing_sources",
+            "displayName": "Failing Sources",
+            "expr": "COUNT(DISTINCT table_name) FILTER (WHERE hard_failed_records > 0)"
+          },
+          {
+            "name": "entities_monitored",
+            "displayName": "Entities Monitored",
+            "expr": "COUNT(DISTINCT table_name)"
+          }
+        ]
+      }
+    }
+  ],
+  "pages": [
+    {
+      "name": "ops_scorecard",
+      "displayName": "Data Quality Scorecard",
+      "layout": [
+        {
+          "widget": {
+            "name": "kpi_score",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "dq_scorecard",
+                  "fields": [
+                    {
+                      "name": "measure(quality_score)",
+                      "expression": "MEASURE(`quality_score`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "headerAlignment": "center",
+                "contentAlignment": "center",
+                "title": {
+                  "value": "<span style=\"color:#E8A33D;font-weight:700\">Quality Score</span>",
+                  "fields": []
+                },
+                "description": {
+                  "value": "1 − (hard failures ÷ records checked)",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(quality_score)",
+                  "format": {
+                    "type": "number-percent",
+                    "decimalPlaces": {
+                      "type": "exact",
+                      "places": 2
+                    }
+                  },
+                  "style": {
+                    "fontSize": 44,
+                    "fontWeight": 700,
+                    "fontColor": "#2E9E5B",
+                    "rules": [
+                      {
+                        "condition": {
+                          "operand": {
+                            "type": "data-value",
+                            "value": "0.99"
+                          },
+                          "operator": "<"
+                        },
+                        "fontColor": "#E8A33D"
+                      }
+                    ]
+                  },
+                  "displayName": "Quality Score"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi_checks",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "dq_incidents",
+                  "fields": [
+                    {
+                      "name": "measure(failed_checks)",
+                      "expression": "MEASURE(`failed_checks`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "headerAlignment": "center",
+                "contentAlignment": "center",
+                "title": {
+                  "value": "<span style=\"color:#D93F3F;font-weight:700\">Failed Checks</span>",
+                  "fields": []
+                },
+                "description": {
+                  "value": "Individual hard-check violations",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(failed_checks)",
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "compact",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    }
+                  },
+                  "style": {
+                    "fontSize": 44,
+                    "fontWeight": 700,
+                    "fontColor": "#2E9E5B",
+                    "rules": [
+                      {
+                        "condition": {
+                          "operand": {
+                            "type": "data-value",
+                            "value": "0"
+                          },
+                          "operator": ">"
+                        },
+                        "fontColor": "#D93F3F"
+                      }
+                    ]
+                  },
+                  "displayName": "Failed Checks"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 0,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi_quarantined",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "dq_scorecard",
+                  "fields": [
+                    {
+                      "name": "measure(hard_failures)",
+                      "expression": "MEASURE(`hard_failures`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "headerAlignment": "center",
+                "contentAlignment": "center",
+                "title": {
+                  "value": "<span style=\"color:#E8A33D;font-weight:700\">Quarantined Records</span>",
+                  "fields": []
+                },
+                "description": {
+                  "value": "Rows blocked by hard checks",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(hard_failures)",
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "compact",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    }
+                  },
+                  "style": {
+                    "fontSize": 44,
+                    "fontWeight": 700,
+                    "fontColor": "#2E9E5B",
+                    "rules": [
+                      {
+                        "condition": {
+                          "operand": {
+                            "type": "data-value",
+                            "value": "0"
+                          },
+                          "operator": ">"
+                        },
+                        "fontColor": "#E8A33D"
+                      }
+                    ]
+                  },
+                  "displayName": "Quarantined Records"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 0,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi_sources",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "dq_scorecard",
+                  "fields": [
+                    {
+                      "name": "measure(failing_sources)",
+                      "expression": "MEASURE(`failing_sources`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "headerAlignment": "center",
+                "contentAlignment": "center",
+                "title": {
+                  "value": "<span style=\"color:#D93F3F;font-weight:700\">Affected Sources</span>",
+                  "fields": []
+                },
+                "description": {
+                  "value": "Entities with at least one hard failure",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(failing_sources)",
+                  "formatTemplate": "{{ @formatted }} / 9",
+                  "style": {
+                    "fontSize": 44,
+                    "fontWeight": 700,
+                    "fontColor": "#2E9E5B",
+                    "rules": [
+                      {
+                        "condition": {
+                          "operand": {
+                            "type": "data-value",
+                            "value": "3"
+                          },
+                          "operator": ">="
+                        },
+                        "fontColor": "#D93F3F"
+                      },
+                      {
+                        "condition": {
+                          "operand": {
+                            "type": "data-value",
+                            "value": "0"
+                          },
+                          "operator": ">"
+                        },
+                        "fontColor": "#E8A33D"
+                      }
+                    ]
+                  },
+                  "displayName": "Affected Sources"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 9,
+            "y": 0,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "major_failures",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "dq_incidents",
+                  "fields": [
+                    {
+                      "name": "check_category",
+                      "expression": "`check_category`"
+                    },
+                    {
+                      "name": "measure(failed_checks)",
+                      "expression": "MEASURE(`failed_checks`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "<span style=\"font-size: 18px;\">Major Failures by Category</span>",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "measure(failed_checks)",
+                  "displayName": "Failed Checks",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "check_category",
+                  "displayName": "Category",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "x-reversed"
+                    }
+                  }
+                },
+                "color": {
+                  "fieldName": "check_category",
+                  "displayName": "Category",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 3,
+            "width": 12,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "source_health",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "dq_scorecard",
+                  "fields": [
+                    {
+                      "name": "health_status",
+                      "expression": "`health_status`"
+                    },
+                    {
+                      "name": "table_name",
+                      "expression": "`table_name`"
+                    },
+                    {
+                      "name": "measure(quality_score)",
+                      "expression": "MEASURE(`quality_score`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "title": {
+                  "value": "<span style=\"text-align:left;display:block;\"><span style=\"font-size: 24px;color: #FFFFFF;\">Affected Sources - Quality Score</span></span>",
+                  "fields": []
+                },
+                "description": {
+                  "value": "<span style=\"color: #FFFFFF;\">Lowest-scoring entities first</span>",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "table_name",
+                  "displayName": "Entity",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "custom-order",
+                      "orderedValues": [
+                        "transactions",
+                        "promotions",
+                        "regions",
+                        "returns",
+                        "inventory",
+                        "products",
+                        "stores",
+                        "customers",
+                        "calendar"
+                      ]
+                    }
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(quality_score)",
+                  "displayName": "Quality Score",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "health_status",
+                  "displayName": "Health Status",
+                  "scale": {
+                    "type": "categorical",
+                    "mappings": [
+                      {
+                        "value": "1 - Healthy",
+                        "color": "#2E9E5B"
+                      },
+                      {
+                        "value": "2 - Elevated",
+                        "color": "#E8A33D"
+                      },
+                      {
+                        "value": "3 - Critical",
+                        "color": "#D93F3F"
+                      }
+                    ]
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 10,
+            "width": 12,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "recent_incidents",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "dq_incidents",
+                  "fields": [
+                    {
+                      "name": "measure(last_detected)",
+                      "expression": "MEASURE(`last_detected`)"
+                    },
+                    {
+                      "name": "entity",
+                      "expression": "`entity`"
+                    },
+                    {
+                      "name": "check_category",
+                      "expression": "`check_category`"
+                    },
+                    {
+                      "name": "failed_check",
+                      "expression": "`failed_check`"
+                    },
+                    {
+                      "name": "measure(failed_checks)",
+                      "expression": "MEASURE(`failed_checks`)"
+                    },
+                    {
+                      "name": "measure(last_record_date)",
+                      "expression": "MEASURE(`last_record_date`)"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "`record_date` < DATE'2026-10-21'"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "<span style=\"text-align:left;display:block;\"><span style=\"font-size: 24px;font-weight: 700;color: #FFFFFF;\">Recent Incidents</span></span>",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "measure(last_detected)",
+                    "displayName": "Last Detected"
+                  },
+                  {
+                    "fieldName": "entity",
+                    "displayName": "Entity"
+                  },
+                  {
+                    "fieldName": "check_category",
+                    "displayName": "Category"
+                  },
+                  {
+                    "fieldName": "failed_check",
+                    "displayName": "Failed Check"
+                  },
+                  {
+                    "fieldName": "measure(failed_checks)",
+                    "displayName": "Occurrences"
+                  },
+                  {
+                    "fieldName": "measure(last_record_date)",
+                    "displayName": "Latest Record Date"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 17,
+            "width": 12,
+            "height": 8
+          }
+        },
+        {
+          "widget": {
+            "name": "lineage_audit",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "dq_incidents",
+                  "fields": [
+                    {
+                      "name": "entity",
+                      "expression": "`entity`"
+                    },
+                    {
+                      "name": "quarantine_table",
+                      "expression": "`quarantine_table`"
+                    },
+                    {
+                      "name": "measure(failed_checks)",
+                      "expression": "MEASURE(`failed_checks`)"
+                    }
+                  ],
+                  "disaggregated": false,
+                  "orders": [
+                    {
+                      "direction": "DESC",
+                      "expression": "MEASURE(`failed_checks`)"
+                    }
+                  ]
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "title": {
+                  "value": "<span style=\"text-align:center;display:block;\"><span style=\"font-weight: 700;font-size: 24px;color: #FFFFFF;\">Lineage &amp; Audit Trail</span></span>",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "entity",
+                    "displayName": "Entity"
+                  },
+                  {
+                    "fieldName": "quarantine_table",
+                    "displayName": "Quarantine Table"
+                  },
+                  {
+                    "fieldName": "measure(failed_checks)",
+                    "contentAlignment": "right",
+                    "format": {
+                      "type": "number-plain",
+                      "abbreviation": "compact",
+                      "decimalPlaces": {
+                        "type": "max",
+                        "places": 1
+                      }
+                    },
+                    "displayName": "Failed Checks",
+                    "style": {
+                      "type": "basic",
+                      "rules": [
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "1000"
+                            },
+                            "operator": ">="
+                          },
+                          "foregroundColor": "#D93F3F",
+                          "fontWeight": 700
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "0"
+                            },
+                            "operator": ">"
+                          },
+                          "foregroundColor": "#E8A33D",
+                          "fontWeight": 600
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "rowOrder": [
+                  {
+                    "by": "column-reversed",
+                    "field": {
+                      "index": 2
+                    }
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 25,
+            "width": 7,
+            "height": 5
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "canvasBackgroundColor": {
+        "light": "#F4F6F9",
+        "dark": "#0F1419"
+      },
+      "widgetBackgroundColor": {
+        "light": "#FFFFFF",
+        "dark": "#1A2129"
+      },
+      "widgetBorderColor": {
+        "light": "#FFFFFF",
+        "dark": "#1A2129"
+      },
+      "visualizationColors": [
+        "#1F6FEB",
+        "#2DA44E",
+        "#D29922",
+        "#CF222E",
+        "#8250DF",
+        "#0E8A9E",
+        "#E16F24",
+        "#6E7781"
+      ],
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED",
+      "widgetCornerRadius": 8,
+      "widgetShadow": 10,
+      "continuousGradient": {
+        "lightMode": {
+          "customDiverging": {
+            "start": "#2DA44E",
+            "mid": "#D29922",
+            "end": "#CF222E"
+          }
+        },
+        "darkMode": {
+          "customDiverging": {
+            "start": "#3FB950",
+            "mid": "#E3B341",
+            "end": "#F85149"
+          }
+        }
+      },
+      "fontSettings": {
+        "base": {
+          "fontFamily": "Inter"
+        },
+        "widgetTitle": {
+          "fontWeight": 600
+        }
+      },
+      "visualizationColorMappings": [
+        {
+          "value": "1 - Healthy",
+          "color": "#2DA44E"
+        },
+        {
+          "value": "2 - Elevated",
+          "color": "#D29922"
+        },
+        {
+          "value": "3 - Critical",
+          "color": "#CF222E"
+        }
+      ]
+    },
+    "applyModeEnabled": false
+  }
+}

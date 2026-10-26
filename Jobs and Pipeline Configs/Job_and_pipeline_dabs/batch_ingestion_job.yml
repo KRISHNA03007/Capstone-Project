@@ -64,3 +64,4 @@ resources:
             is_single_node: true
       queue:
         enabled: true
+

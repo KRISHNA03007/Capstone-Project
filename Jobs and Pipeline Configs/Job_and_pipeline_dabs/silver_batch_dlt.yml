@@ -16,3 +16,4 @@ resources:
             include: ../../Lakeflow Declarative Pipeline/MavenMarket Silver Batch DLT/Updated Final/**
       catalog: ${var.catalog_name}
       schema: silver
+
