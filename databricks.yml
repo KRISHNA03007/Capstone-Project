@@ -12,7 +12,7 @@ variables:
 
   sql_warehouse_id:
     description: Databricks SQL Warehouse ID for Genie space and Dashboards
-    default: "35cc87a5d9ff97c9"
+    default: "65160a601ff72fe8"
 
 include:
   - "Jobs and Pipeline Configs/Job_and_pipeline_dabs/*.yml"
@@ -25,7 +25,7 @@ targets:
       root_path: /Shared/.bundle/${bundle.name}/prod
     variables:
       catalog_name: mavenmarket
-      sql_warehouse_id: "35cc87a5d9ff97c9"
+      sql_warehouse_id: "65160a601ff72fe8"
 
 resources:
   dashboards:
