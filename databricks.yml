@@ -6,6 +6,20 @@ variables:
     description: Target Unity Catalog for medallion architecture
     default: maven_test
 
+  # Cluster node type used across all jobs and DLT pipelines
+  node_type_id:
+    description: VM node type for all job and pipeline clusters
+    default: "Standard_D4a_v4"
+
+  # Spark runtime versions per workload
+  batch_spark_version:
+    description: Spark version for batch ingestion job cluster
+    default: "13.3.x-scala2.12"
+
+  kafka_spark_version:
+    description: Spark version for Kafka ingestion job cluster
+    default: "14.3.x-scala2.12"
+
 targets:
   # 1. Individual developer workspace targets
   dev:
@@ -34,7 +48,13 @@ targets:
 
 # Resources section defining your workflows and pipelines
 resources:
+
+  # ─────────────────────────────────────────────────────────────────
+  # JOBS
+  # ─────────────────────────────────────────────────────────────────
   jobs:
+
+    # Existing medallion orchestration job
     medallion_pipeline_job:
       name: "[${bundle.target}] Medallion Pipeline Execution"
       tasks:
@@ -42,4 +62,290 @@ resources:
           notebook_task:
             notebook_path: adls_ingestion/Stores_ingestion.ipynb
             base_parameters:
+              catalog: ${var.catalog_name}
+
+    # ── Batch Ingestion Job ─────────────────────────────────────────
+    Batch_Ingestion_Job:
+      name: "Batch Ingestion Job"
+      trigger:
+        pause_status: UNPAUSED
+        periodic:
+          interval: 1
+          unit: DAYS
+      tasks:
+        - task_key: Ingest_Customers
+          notebook_task:
+            notebook_path: /Workspace/${workspace.root_path}/mongo_ingestion/Customers
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+          libraries:
+            - maven:
+                coordinates: org.mongodb.spark:mongo-spark-connector_2.12:10.4.0  # HARDCODED - see note
+        - task_key: Ingest_Products
+          notebook_task:
+            notebook_path: /Workspace/${workspace.root_path}/mongo_ingestion/Products
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+          libraries:
+            - maven:
+                coordinates: org.mongodb.spark:mongo-spark-connector_2.12:10.4.0  # HARDCODED - see note
+        - task_key: Ingest_Promotions
+          notebook_task:
+            notebook_path: /Workspace/${workspace.root_path}/adls_ingestion/promotions_ingestion
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+        - task_key: Ingest_Regions
+          notebook_task:
+            notebook_path: /Workspace/${workspace.root_path}/adls_ingestion/region_ingestion
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+        - task_key: Ingest_Returns
+          depends_on:
+            - task_key: Ingest_Customers
+            - task_key: Ingest_Products
+          notebook_task:
+            notebook_path: /Workspace/${workspace.root_path}/adls_ingestion/returns_ingestion
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+        - task_key: Ingest_Stores
+          notebook_task:
+            notebook_path: /Workspace/${workspace.root_path}/adls_ingestion/Stores_ingestion
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+        - task_key: Ingest_Transactions
+          depends_on:
+            - task_key: Ingest_Customers
+            - task_key: Ingest_Products
+          notebook_task:
+            notebook_path: /Workspace/${workspace.root_path}/adls_ingestion/transaction_ingestion
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+        - task_key: Ingest_calender
+          notebook_task:
+            notebook_path: /Workspace/${workspace.root_path}/adls_ingestion/calender_generation
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+      job_clusters:
+        - job_cluster_key: Job_cluster
+          new_cluster:
+            cluster_name: ""
+            spark_version: ${var.batch_spark_version}
+            node_type_id: ${var.node_type_id}
+            data_security_mode: DATA_SECURITY_MODE_DEDICATED  # HARDCODED - see note
+            runtime_engine: STANDARD                           # HARDCODED - see note
+            kind: CLASSIC_PREVIEW                              # HARDCODED - see note
+            is_single_node: true
+      queue:
+        enabled: true
+
+    # ── Kafka Ingestion Job ─────────────────────────────────────────
+    Kafka_Ingestion_Job:
+      name: "Kafka Ingestion Job"
+      continuous:
+        pause_status: PAUSED        # HARDCODED - see note
+        task_retry_mode: ON_FAILURE # HARDCODED - see note
+      tasks:
+        - task_key: Ingest_Kafka_Inventory
+          notebook_task:
+            notebook_path: /Workspace/${workspace.root_path}/kafka_ingestion/kafka_inventory_bronze_ingestion
+            source: WORKSPACE
+          job_cluster_key: job_cluster
+        - task_key: Ingest_Kafka_Orders
+          notebook_task:
+            notebook_path: /Workspace/${workspace.root_path}/kafka_ingestion/kafka_orders_bronze_ingestion
+            source: WORKSPACE
+          job_cluster_key: job_cluster
+      job_clusters:
+        - job_cluster_key: job_cluster
+          new_cluster:
+            cluster_name: ""
+            spark_version: ${var.kafka_spark_version}
+            node_type_id: ${var.node_type_id}
+            data_security_mode: DATA_SECURITY_MODE_AUTO # HARDCODED - see note
+            runtime_engine: STANDARD                    # HARDCODED - see note
+            kind: CLASSIC_PREVIEW                       # HARDCODED - see note
+            use_ml_runtime: false
+            is_single_node: true
+      queue:
+        enabled: true
+
+  # ─────────────────────────────────────────────────────────────────
+  # PIPELINES  (Lakeflow Declarative / DLT)
+  # ─────────────────────────────────────────────────────────────────
+  pipelines:
+
+    # ── Silver Batch DLT ───────────────────────────────────────────
+    pipeline_silver_batch_dlt:
+      name: "Silver Batch DLT"
+      clusters:
+        - label: default
+          node_type_id: ${var.node_type_id}
+          num_workers: 0  # HARDCODED - see note
+      libraries:
+        - glob:
+            include: /Workspace/${workspace.root_path}/Lakeflow Declarative Pipeline/MavenMarket Silver Batch DLT/Updated Final/**
+      schema: silver
+      catalog: mavenmarket  # HARDCODED - see note
+      root_path: /Workspace/${workspace.root_path}/Lakeflow Declarative Pipeline/MavenMarket Silver Batch DLT
+
+    # ── Gold DLT ───────────────────────────────────────────────────
+    pipeline_gold_dlt:
+      name: "Gold DLT"
+      clusters:
+        - label: default
+          node_type_id: ${var.node_type_id}
+          num_workers: 0  # HARDCODED - see note
+      libraries:
+        - glob:
+            include: /Workspace/${workspace.root_path}/GoldLayer/MaterializedViews/**
+        - glob:
+            include: /Workspace/${workspace.root_path}/GoldLayer/StarSchema/DimensionTables/**
+        - glob:
+            include: /Workspace/${workspace.root_path}/GoldLayer/StarSchema/FactTables/**
+      schema: gold
+      catalog: mavenmarket  # HARDCODED - see note
+      root_path: /Workspace/${workspace.root_path}/GoldLayer
+
+
+    # ── Batch Ingestion Job ─────────────────────────────────────────
+    Batch_Ingestion_Job:
+      name: "Batch Ingestion Job"
+      trigger:
+        pause_status: UNPAUSED
+        periodic:
+          interval: 1
+          unit: DAYS
+      tasks:
+        - task_key: Ingest_Customers
+          notebook_task:
+            notebook_path: /Workspace/${workspace.root_path}/mongo_ingestion/Customers
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+          libraries:
+            - maven:
+                coordinates: org.mongodb.spark:mongo-spark-connector_2.12:10.4.0  # HARDCODED - see note
+        - task_key: Ingest_Products
+          notebook_task:
+            notebook_path: /Workspace/${workspace.root_path}/mongo_ingestion/Products
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+          libraries:
+            - maven:
+                coordinates: org.mongodb.spark:mongo-spark-connector_2.12:10.4.0  # HARDCODED - see note
+        - task_key: Ingest_Promotions
+          notebook_task:
+            notebook_path: /Workspace/${workspace.root_path}/adls_ingestion/promotions_ingestion
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+        - task_key: Ingest_Regions
+          notebook_task:
+            notebook_path: /Workspace/${workspace.root_path}/adls_ingestion/region_ingestion
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+        - task_key: Ingest_Returns
+          depends_on:
+            - task_key: Ingest_Customers
+            - task_key: Ingest_Products
+          notebook_task:
+            notebook_path: /Workspace/${workspace.root_path}/adls_ingestion/returns_ingestion
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+        - task_key: Ingest_Stores
+          notebook_task:
+            notebook_path: /Workspace/${workspace.root_path}/adls_ingestion/Stores_ingestion
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+        - task_key: Ingest_Transactions
+          depends_on:
+            - task_key: Ingest_Customers
+            - task_key: Ingest_Products
+          notebook_task:
+            notebook_path: /Workspace/${workspace.root_path}/adls_ingestion/transaction_ingestion
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+        - task_key: Ingest_calender
+          notebook_task:
+            notebook_path: /Workspace/${workspace.root_path}/adls_ingestion/calender_generation
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+      job_clusters:
+        - job_cluster_key: Job_cluster
+          new_cluster:
+            cluster_name: ""
+            spark_version: ${var.batch_spark_version}
+            node_type_id: ${var.node_type_id}
+            data_security_mode: DATA_SECURITY_MODE_DEDICATED  # HARDCODED - see note
+            runtime_engine: STANDARD                           # HARDCODED - see note
+            kind: CLASSIC_PREVIEW                              # HARDCODED - see note
+            is_single_node: true
+      queue:
+        enabled: true
+
+    # ── Kafka Ingestion Job ─────────────────────────────────────────
+    Kafka_Ingestion_Job:
+      name: "Kafka Ingestion Job"
+      continuous:
+        pause_status: PAUSED        # HARDCODED - see note
+        task_retry_mode: ON_FAILURE # HARDCODED - see note
+      tasks:
+        - task_key: Ingest_Kafka_Inventory
+          notebook_task:
+            notebook_path: /Workspace/${workspace.root_path}/kafka_ingestion/kafka_inventory_bronze_ingestion
+            source: WORKSPACE
+          job_cluster_key: job_cluster
+        - task_key: Ingest_Kafka_Orders
+          notebook_task:
+            notebook_path: /Workspace/${workspace.root_path}/kafka_ingestion/kafka_orders_bronze_ingestion
+            source: WORKSPACE
+          job_cluster_key: job_cluster
+      job_clusters:
+        - job_cluster_key: job_cluster
+          new_cluster:
+            cluster_name: ""
+            spark_version: ${var.kafka_spark_version}
+            node_type_id: ${var.node_type_id}
+            data_security_mode: DATA_SECURITY_MODE_AUTO # HARDCODED - see note
+            runtime_engine: STANDARD                    # HARDCODED - see note
+            kind: CLASSIC_PREVIEW                       # HARDCODED - see note
+            use_ml_runtime: false
+            is_single_node: true
+      queue:
+        enabled: true
+
+  # ─────────────────────────────────────────────────────────────────
+  # PIPELINES  (Lakeflow Declarative / DLT)
+  # ─────────────────────────────────────────────────────────────────
+  pipelines:
+
+    # ── Silver Batch DLT ───────────────────────────────────────────
+    pipeline_silver_batch_dlt:
+      name: "Silver Batch DLT"
+      clusters:
+        - label: default
+          node_type_id: ${var.node_type_id}
+          num_workers: 0  # HARDCODED - see note
+      libraries:
+        - glob:
+            include: /Workspace/${workspace.root_path}/Lakeflow Declarative Pipeline/MavenMarket Silver Batch DLT/Updated Final/**
+      schema: silver
+      catalog: mavenmarket  # HARDCODED - see note
+      root_path: /Workspace/${workspace.root_path}/Lakeflow Declarative Pipeline/MavenMarket Silver Batch DLT
+
+    # ── Gold DLT ───────────────────────────────────────────────────
+    pipeline_gold_dlt:
+      name: "Gold DLT"
+      clusters:
+        - label: default
+          node_type_id: ${var.node_type_id}
+          num_workers: 0  # HARDCODED - see note
+      libraries:
+        - glob:
+            include: /Workspace/${workspace.root_path}/GoldLayer/MaterializedViews/**
+        - glob:
+            include: /Workspace/${workspace.root_path}/GoldLayer/StarSchema/DimensionTables/**
+        - glob:
+            include: /Workspace/${workspace.root_path}/GoldLayer/StarSchema/FactTables/**
+      schema: gold
+      catalog: mavenmarket  # HARDCODED - see note
+      root_path: /Workspace/${workspace.root_path}/GoldLayer
               catalog: ${var.catalog_name}
