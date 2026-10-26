@@ -1,0 +1,1500 @@
+{
+  "benchmarks": {
+    "questions": [
+      {
+        "answer": [
+          {
+            "content": [
+              "SELECT\r\n",
+              "  st.store_name,\r\n",
+              "  SUM(r.return_quantity) AS total_returned,\r\n",
+              "  SUM(s.sales_quantity) AS total_sold,\r\n",
+              "  ROUND(SUM(r.return_quantity) * 100.0 / SUM(s.sales_quantity), 2) AS return_rate_pct\r\n",
+              "FROM\r\n",
+              "  mavenmarket.gold.fact_sales s\r\n",
+              "JOIN\r\n",
+              "  mavenmarket.gold.fact_returns r ON s.store_sk = r.store_sk\r\n",
+              "JOIN\r\n",
+              "  mavenmarket.gold.dim_store st ON s.store_sk = st.store_sk\r\n",
+              "GROUP BY\r\n",
+              "  st.store_name\r\n",
+              "ORDER BY\r\n",
+              "  return_rate_pct DESC\r\n",
+              "LIMIT 20;"
+            ],
+            "format": "SQL"
+          }
+        ],
+        "id": "01f1cfd2d8d11a19ba8204f7887a57bf",
+        "question": [
+          "What is the return rate by store?"
+        ]
+      },
+      {
+        "answer": [
+          {
+            "content": [
+              "SELECT\r\n",
+              "  SUM(restock_quantity) AS total_restock_quantity\r\n",
+              "FROM\r\n",
+              "  mavenmarket.gold.fact_inventory\r\n",
+              "HAVING\r\n",
+              "  SUM(restock_quantity) IS NOT NULL;"
+            ],
+            "format": "SQL"
+          }
+        ],
+        "id": "01f1cfd2a29810658b058e3a934cee92",
+        "question": [
+          "What is the total restock quantity for inventory? "
+        ]
+      },
+      {
+        "answer": [
+          {
+            "content": [
+              "SELECT\r\n",
+              "  ROUND(\r\n",
+              "    (SELECT SUM(return_quantity) FROM mavenmarket.gold.fact_returns) * 100.0 / \r\n",
+              "    (SELECT SUM(sales_quantity) FROM mavenmarket.gold.fact_sales), 2\r\n",
+              "  ) AS overall_return_rate_pct;"
+            ],
+            "format": "SQL"
+          }
+        ],
+        "id": "01f1cfd25bd8183ca240d7140b9fa10e",
+        "question": [
+          "What is the overall return rate percentage?"
+        ]
+      },
+      {
+        "answer": [
+          {
+            "content": [
+              "SELECT\r\n",
+              "  d.year_number,\r\n",
+              "  SUM(s.gross_revenue_amount) AS total_revenue\r\n",
+              "FROM\r\n",
+              "  mavenmarket.gold.fact_sales s\r\n",
+              "JOIN\r\n",
+              "  mavenmarket.gold.dim_date d ON s.transaction_date_sk = d.date_sk\r\n",
+              "WHERE\r\n",
+              "  d.year_number IS NOT NULL\r\n",
+              "GROUP BY\r\n",
+              "  d.year_number\r\n",
+              "HAVING\r\n",
+              "  SUM(s.gross_revenue_amount) > 0\r\n",
+              "ORDER BY\r\n",
+              "  d.year_number DESC;"
+            ],
+            "format": "SQL"
+          }
+        ],
+        "id": "01f1cfd22b6b1a45b6df633949b85ec3",
+        "question": [
+          "What is our year-over-year revenue growth? "
+        ]
+      },
+      {
+        "answer": [
+          {
+            "content": [
+              "SELECT\r\n",
+              "  p.product_name,\r\n",
+              "  p.brand_name,\r\n",
+              "  p.category_name,\r\n",
+              "  SUM(r.return_quantity) AS total_returned\r\n",
+              "FROM\r\n",
+              "  mavenmarket.gold.fact_returns r\r\n",
+              "JOIN\r\n",
+              "  mavenmarket.gold.dim_product p ON r.product_sk = p.product_sk\r\n",
+              "WHERE\r\n",
+              "  p.product_name IS NOT NULL\r\n",
+              "GROUP BY\r\n",
+              "  p.product_name,\r\n",
+              "  p.brand_name,\r\n",
+              "  p.category_name\r\n",
+              "HAVING\r\n",
+              "  SUM(r.return_quantity) > 0\r\n",
+              "ORDER BY\r\n",
+              "  total_returned DESC\r\n",
+              "LIMIT 20;"
+            ],
+            "format": "SQL"
+          }
+        ],
+        "id": "01f1cfd1fb6e1d3683e5d20ab6cbb1d1",
+        "question": [
+          "Which products have the highest return quantities?"
+        ]
+      },
+      {
+        "answer": [
+          {
+            "content": [
+              "SELECT\n",
+              "  COUNT(DISTINCT customer_id) AS total_unique_customers\n",
+              "FROM\n",
+              "  mavenmarket.gold.dim_customer\n",
+              "HAVING\n",
+              "  COUNT(DISTINCT customer_id) > 0"
+            ],
+            "format": "SQL"
+          }
+        ],
+        "id": "01f1ced19bb81855b9c035671e4a5a6e",
+        "question": [
+          "How many unique customers do we have?"
+        ]
+      },
+      {
+        "answer": [
+          {
+            "content": [
+              "SELECT\n",
+              "  r.sales_region_name,\n",
+              "  SUM(s.gross_revenue_amount) AS total_revenue\n",
+              "FROM\n",
+              "  mavenmarket.gold.fact_sales s\n",
+              "JOIN\n",
+              "  mavenmarket.gold.dim_store st ON s.store_sk = st.store_sk\n",
+              "JOIN\n",
+              "  mavenmarket.gold.dim_region r ON st.region_sk = r.region_sk\n",
+              "WHERE\n",
+              "  r.sales_region_name IS NOT NULL\n",
+              "GROUP BY\n",
+              "  r.sales_region_name\n",
+              "HAVING\n",
+              "  SUM(s.gross_revenue_amount) > 0\n",
+              "ORDER BY\n",
+              "  total_revenue DESC;"
+            ],
+            "format": "SQL"
+          }
+        ],
+        "id": "01f1ced1819d18fc94e9b5fc1568936d",
+        "question": [
+          "What is the revenue broken down by region?"
+        ]
+      },
+      {
+        "answer": [
+          {
+            "content": [
+              "SELECT\n",
+              "  SUM(gross_profit_amount) AS total_gross_profit\n",
+              "FROM\n",
+              "  mavenmarket.gold.fact_sales\n",
+              "HAVING\n",
+              "  SUM(gross_profit_amount) IS NOT NULL;"
+            ],
+            "format": "SQL"
+          }
+        ],
+        "id": "01f1ced15ff11136b34c2c6ff9f05a99",
+        "question": [
+          "What is the overall gross profit?"
+        ]
+      },
+      {
+        "answer": [
+          {
+            "content": [
+              "SELECT\n",
+              "  ROUND(SUM(gross_profit_amount) * 100.0 / SUM(gross_revenue_amount), 2) AS profit_margin_pct\n",
+              "FROM\n",
+              "  mavenmarket.gold.fact_sales\n",
+              "HAVING\n",
+              "  SUM(gross_revenue_amount) > 0;"
+            ],
+            "format": "SQL"
+          }
+        ],
+        "id": "01f1ced0fb1c1459bbb5e5e6ec8a2b8e",
+        "question": [
+          "What is our profit margin percentage?"
+        ]
+      },
+      {
+        "answer": [
+          {
+            "content": [
+              "SELECT\n",
+              "  SUM(gross_revenue_amount) AS total_revenue\n",
+              "FROM\n",
+              "  mavenmarket.gold.fact_sales\n",
+              "HAVING\n",
+              "  SUM(gross_revenue_amount) > 0;"
+            ],
+            "format": "SQL"
+          }
+        ],
+        "id": "01f1ced049da18b989b6234e820d18e0",
+        "question": [
+          "What is our total revenue?"
+        ]
+      }
+    ]
+  },
+  "data_sources": {
+    "tables": [
+      {
+        "column_configs": [
+          {
+            "column_name": "account_number",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "account_open_date",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "age_years",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "birth_date",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "city_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "country_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "customer_id",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "customer_sk",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "education_level",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "end_at_timestamp",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "first_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "full_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "gender_code",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "homeowner_flag",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "is_current_flag",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "last_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "marital_status_code",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "occupation_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "postal_code",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "start_at_timestamp",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "state_province_code",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "street_address",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "yearly_income_amount",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "yearly_income_range",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          }
+        ],
+        "identifier": "mavenmarket.gold.dim_customer"
+      },
+      {
+        "column_configs": [
+          {
+            "column_name": "calendar_date",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "date_sk",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "day_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "day_of_month",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "day_of_week_number",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "is_weekend_flag",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "month_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "month_number",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "quarter_number",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "year_month_code",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "year_number",
+            "enable_format_assistance": true
+          }
+        ],
+        "identifier": "mavenmarket.gold.dim_date"
+      },
+      {
+        "column_configs": [
+          {
+            "column_name": "brand_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "category_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "end_at_timestamp",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "is_current_flag",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "is_low_fat_flag",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "is_recyclable_flag",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "product_id",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "product_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "product_sk",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "retail_price_amount",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "sku_code",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "start_at_timestamp",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "unit_cost_amount",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "unit_weight_lbs",
+            "enable_format_assistance": true
+          }
+        ],
+        "identifier": "mavenmarket.gold.dim_product"
+      },
+      {
+        "column_configs": [
+          {
+            "column_name": "discount_percentage",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "end_at_timestamp",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "end_date",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "is_current_flag",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "marketing_channel",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "media_type",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "promotion_id",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "promotion_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "promotion_sk",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "promotion_type",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "start_at_timestamp",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "start_date",
+            "enable_format_assistance": true
+          }
+        ],
+        "identifier": "mavenmarket.gold.dim_promotion"
+      },
+      {
+        "column_configs": [
+          {
+            "column_name": "end_at_timestamp",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "is_current_flag",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "region_id",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "region_sk",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "sales_district_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "sales_region_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "start_at_timestamp",
+            "enable_format_assistance": true
+          }
+        ],
+        "identifier": "mavenmarket.gold.dim_region"
+      },
+      {
+        "column_configs": [
+          {
+            "column_name": "city_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "country_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "end_at_timestamp",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "first_opened_date",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "grocery_area_sqft",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "is_current_flag",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "last_remodel_date",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "phone_number",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "region_id",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "region_sk",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "start_at_timestamp",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "state_province_code",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "store_id",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "store_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "store_sk",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "store_type_description",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "street_address",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "total_area_sqft",
+            "enable_format_assistance": true
+          }
+        ],
+        "identifier": "mavenmarket.gold.dim_store"
+      },
+      {
+        "column_configs": [
+          {
+            "column_name": "event_id",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "product_sk",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "restock_date_key",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "restock_quantity",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "store_sk",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          }
+        ],
+        "identifier": "mavenmarket.gold.fact_inventory"
+      },
+      {
+        "column_configs": [
+          {
+            "column_name": "product_sk",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "return_date_key",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "return_quantity",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "returns_fact_sk",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "store_sk",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          }
+        ],
+        "identifier": "mavenmarket.gold.fact_returns"
+      },
+      {
+        "column_configs": [
+          {
+            "column_name": "customer_sk",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "gross_profit_amount",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "gross_revenue_amount",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "product_sk",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "promotion_sk",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "sales_fact_sk",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "sales_quantity",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "stock_date_sk",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "store_sk",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "total_cost_amount",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "transaction_date_sk",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "transaction_mode",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          }
+        ],
+        "identifier": "mavenmarket.gold.fact_sales"
+      },
+      {
+        "column_configs": [
+          {
+            "column_name": "active_purchase_days_count",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "age_years",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "avg_order_value",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "avg_units_per_order",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "customer_city",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "customer_country",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "customer_id",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "customer_lifetime_value",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "customer_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "customer_profit_margin_pct",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "customer_sk",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "customer_state",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "days_since_last_purchase",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "distinct_products_bought",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "education_level",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "first_purchase_date",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "gender",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "global_avg_customer_ltv",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "is_homeowner_flag",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "ltv_rank_position",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "ltv_variance_from_avg",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "marital_status",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "most_recent_purchase_date",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "occupation_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "purchase_frequency_tier",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "region_id",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "sales_district_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "sales_region_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "total_active_customers_count",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "total_customer_cost",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "total_customer_count",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "total_orders_count",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "total_profit_generated",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "total_units_purchased",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "yearly_income_amount",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          }
+        ],
+        "identifier": "mavenmarket.gold.gold_customer_analytics_performance"
+      },
+      {
+        "column_configs": [
+          {
+            "column_name": "avg_units_per_online_order",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "brand_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "category_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "channel_type",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "distinct_online_buyers_count",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "gross_online_profit_amount",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "gross_online_revenue_amount",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "month_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "month_number",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "online_average_order_value",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "online_profit_margin_pct",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "online_profit_yoy_growth_amount",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "online_profit_yoy_growth_pct",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "online_return_rate_pct",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "online_revenue_yoy_growth_amount",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "online_revenue_yoy_growth_pct",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "prior_year_online_profit",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "prior_year_online_revenue",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "product_id",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "product_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "product_sk",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "quarter_number",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "region_id",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "region_sk",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "sales_district_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "sales_region_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "sku_code",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "store_city",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "store_country",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "store_id",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "store_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "store_sk",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "store_state",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "store_type_description",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "total_online_cost_amount",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "total_online_orders_count",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "total_online_units_returned",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "total_online_units_sold",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "year_month_code",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "year_number",
+            "enable_format_assistance": true
+          }
+        ],
+        "identifier": "mavenmarket.gold.gold_online_orders_performance"
+      },
+      {
+        "column_configs": [
+          {
+            "column_name": "brand_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "monthly_gross_sales_quantity",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "product_category",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "product_id",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "product_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "product_sk",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "region_sk",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "return_date",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "return_day_of_week",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "return_month_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "return_month_number",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "return_quarter",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "return_rate_pct",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "return_value_pct",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "return_year",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "return_year_month",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "returned_quantity",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "sales_district",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "sales_region",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "sku_code",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "store_city",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "store_id",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "store_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "store_sk",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "store_state",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "total_product_sales_quantity",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "total_return_cost_amount",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "total_return_value_amount",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "unit_cost",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "unit_retail_price",
+            "enable_format_assistance": true
+          }
+        ],
+        "identifier": "mavenmarket.gold.gold_returns_performance"
+      },
+      {
+        "column_configs": [
+          {
+            "column_name": "average_order_value",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "brand_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "category_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "gross_profit_amount",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "gross_revenue_amount",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "month_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "month_number",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "prior_year_gross_profit",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "prior_year_gross_revenue",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "product_id",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "product_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "product_sk",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "profit_margin_pct",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "profit_yoy_growth_amount",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "profit_yoy_growth_pct",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "quarter_number",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "region_id",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "region_sk",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "revenue_yoy_growth_amount",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "revenue_yoy_growth_pct",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "sales_district_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "sales_region_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "sku_code",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "store_city",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "store_country",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "store_id",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "store_name",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "store_sk",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "store_state",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "store_type_description",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "total_cost_amount",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "total_orders_count",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "total_units_sold",
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "transaction_mode",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "year_month_code",
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "year_number",
+            "enable_format_assistance": true
+          }
+        ],
+        "identifier": "mavenmarket.gold.gold_sales_profit_performance"
+      }
+    ]
+  },
+  "instructions": {
+    "example_question_sqls": [
+      {
+        "id": "01f1cfd38d0518228fa4dfaede3a2af7",
+        "question": [
+          "Which products have the highest return rates?"
+        ],
+        "sql": [
+          "SELECT p.product_name, p.brand_name, p.category_name, SUM(r.return_quantity) AS total_returned, SUM(s.sales_quantity) AS total_sold, ROUND(SUM(r.return_quantity) * 100.0 / SUM(s.sales_quantity), 2) AS return_rate_pct FROM mavenmarket.gold.fact_sales s JOIN mavenmarket.gold.dim_product p ON s.product_sk = p.product_sk JOIN mavenmarket.gold.fact_returns r ON p.product_sk = r.product_sk WHERE p.product_name IS NOT NULL GROUP BY p.product_name, p.brand_name, p.category_name HAVING SUM(s.sales_quantity) > 0 ORDER BY return_rate_pct DESC LIMIT 20;"
+        ]
+      },
+      {
+        "id": "01f1cfd39d8310b6ad086897826ca8be",
+        "question": [
+          "Which products have the highest profit margins?"
+        ],
+        "sql": [
+          "SELECT p.product_name, p.category_name, SUM(s.gross_revenue_amount) AS total_revenue, SUM(s.gross_profit_amount) AS total_profit, ROUND(SUM(s.gross_profit_amount) * 100.0 / SUM(s.gross_revenue_amount), 2) AS margin_pct FROM mavenmarket.gold.fact_sales s JOIN mavenmarket.gold.dim_product p ON s.product_sk = p.product_sk GROUP BY p.product_name, p.category_name HAVING SUM(s.gross_revenue_amount) > 1000 ORDER BY margin_pct DESC LIMIT 20;"
+        ]
+      },
+      {
+        "id": "01f1cfd3b03d13c8866bbca9cfa5da20",
+        "question": [
+          "How are stores performing by profitability?"
+        ],
+        "sql": [
+          "SELECT st.store_name, st.city_name, st.store_type_description, SUM(s.sales_quantity) AS total_items_sold, SUM(s.gross_revenue_amount) AS total_revenue, ROUND(SUM(s.gross_profit_amount) * 100.0 / SUM(s.gross_revenue_amount), 2) AS profit_margin_pct FROM mavenmarket.gold.fact_sales s JOIN mavenmarket.gold.dim_store st ON s.store_sk = st.store_sk GROUP BY st.store_name, st.city_name, st.store_type_description HAVING SUM(s.gross_revenue_amount) > 0 ORDER BY total_revenue DESC LIMIT 20;"
+        ]
+      },
+      {
+        "id": "01f1cfd3ccc51448b364c9f4ba9c268b",
+        "question": [
+          "What is the revenue distribution by sales region?"
+        ],
+        "sql": [
+          "SELECT r.sales_region_name, r.sales_district_name, SUM(s.gross_revenue_amount) AS regional_revenue, SUM(s.gross_profit_amount) AS regional_profit, ROUND(SUM(s.gross_profit_amount) * 100.0 / SUM(s.gross_revenue_amount), 2) AS regional_margin_pct FROM mavenmarket.gold.fact_sales s JOIN mavenmarket.gold.dim_store st ON s.store_sk = st.store_sk JOIN mavenmarket.gold.dim_region r ON st.region_sk = r.region_sk GROUP BY r.sales_region_name, r.sales_district_name HAVING SUM(s.gross_revenue_amount) > 0 ORDER BY regional_revenue DESC LIMIT 20;"
+        ]
+      },
+      {
+        "id": "01f1cfd3dc761a6b9cd1527c1b828a1b",
+        "question": [
+          "How effective are our promotions?"
+        ],
+        "sql": [
+          "SELECT pr.promotion_name, pr.promotion_type, SUM(s.sales_quantity) AS promo_items_sold, SUM(s.gross_revenue_amount) AS promo_revenue, ROUND(SUM(s.gross_profit_amount) * 100.0 / SUM(s.gross_revenue_amount), 2) AS promo_margin_pct FROM mavenmarket.gold.fact_sales s JOIN mavenmarket.gold.dim_promotion pr ON s.promotion_sk = pr.promotion_sk WHERE pr.promotion_name != 'No Discount' GROUP BY pr.promotion_name, pr.promotion_type HAVING SUM(s.gross_revenue_amount) > 0 ORDER BY promo_revenue DESC LIMIT 20;"
+        ]
+      },
+      {
+        "id": "01f1cfd3ed1c16c3acd956e1f6774a09",
+        "question": [
+          "How many unique customers do we have?"
+        ],
+        "sql": [
+          "SELECT COUNT(DISTINCT customer_id) AS total_unique_customers FROM mavenmarket.gold.dim_customer HAVING COUNT(DISTINCT customer_id) > 0;"
+        ]
+      },
+      {
+        "id": "01f1cfd3fcf71bf4bc4e40afbcd0c2c2",
+        "question": [
+          "Show the top 10 products by revenue."
+        ],
+        "sql": [
+          "SELECT p.product_name, p.brand_name, p.category_name, SUM(s.gross_revenue_amount) AS total_revenue FROM mavenmarket.gold.fact_sales s JOIN mavenmarket.gold.dim_product p ON s.product_sk = p.product_sk WHERE p.product_name IS NOT NULL GROUP BY p.product_name, p.brand_name, p.category_name HAVING SUM(s.gross_revenue_amount) > 0 ORDER BY total_revenue DESC LIMIT 10;"
+        ]
+      }
+    ],
+    "text_instructions": [
+      {
+        "content": [
+          "* **Revenue (Net Sales)** is calculated as Gross Sales minus Discount.\r\n",
+          "* **Gross Profit** is calculated as Revenue minus Cost.\r\n",
+          "* **Margin %** is calculated as (Gross Profit / Revenue). Always format as a percentage.\r\n",
+          "* **Return Rate %** is calculated as Total Items Returned divided by Total Items Sold.\r\n",
+          "* When a user asks for \"Top Stores\" or \"Top Products\", rank them by Revenue in descending order.\r\n",
+          "* \"Regions\" refers to the region_name column in the Region dimension table."
+        ],
+        "id": "01f1cebfbf731e6c8876bc66274b69a0"
+      }
+    ]
+  },
+  "version": 2
+}

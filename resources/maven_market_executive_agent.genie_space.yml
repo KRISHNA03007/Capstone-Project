@@ -1,0 +1,8 @@
+resources:
+  genie_spaces:
+    maven_market_executive_agent:
+      title: "Maven Market Executive Agent"
+      warehouse_id: 35cc87a5d9ff97c9
+      file_path: ../src/maven_market_executive_agent.geniespace.json
+      description: This Agent helps retail teams analyze sales, profit, online order performance, returns, and customer value across products, stores, regions, channels, and time.
+      parent_path: /Workspace/Shared
