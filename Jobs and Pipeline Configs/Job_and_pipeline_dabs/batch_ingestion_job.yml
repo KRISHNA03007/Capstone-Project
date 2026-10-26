@@ -3,7 +3,7 @@ resources:
     Batch_Ingestion_Job:
       name: Batch Ingestion Job
       trigger:
-        pause_status: UNPAUSED
+        pause_status: PAUSED
         periodic:
           interval: 1
           unit: DAYS
@@ -53,14 +53,15 @@ resources:
             notebook_path: ../../adls_ingestion/calender_generation.ipynb
           job_cluster_key: Job_cluster
       job_clusters:
-        - job_cluster_key: Job_cluster
-          new_cluster:
+      - job_cluster_key: Job_cluster
+        new_cluster:
             cluster_name: ""
             spark_version: 13.3.x-scala2.12
             node_type_id: Standard_D4a_v4
-            data_security_mode: SINGLE_USER
+            data_security_mode: DATA_SECURITY_MODE_DEDICATED
             runtime_engine: STANDARD
-            num_workers: 1
+            kind: CLASSIC_PREVIEW
+            is_single_node: true
       queue:
         enabled: true
 
