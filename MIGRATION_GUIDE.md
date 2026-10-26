@@ -44,7 +44,7 @@ variables:
   catalog_name:
     default: mavenmarket          # <-- 1. Change if your Unity Catalog name changes
   sql_warehouse_id:
-    default: "35cc87a5d9ff97c9"   # <-- 2. Change to your new SQL Warehouse ID
+    default: "65160a601ff72fe8"   # <-- 2. Change to your new SQL Warehouse ID
 
 targets:
   prod:
@@ -52,7 +52,7 @@ targets:
       root_path: /Shared/.bundle/${bundle.name}/prod  # <-- 3. Verify target path
     variables:
       catalog_name: mavenmarket
-      sql_warehouse_id: "35cc87a5d9ff97c9"           # <-- 4. Change here as well
+      sql_warehouse_id: "65160a601ff72fe8"           # <-- 4. Change here as well
 ```
 
 - **Where to get New `sql_warehouse_id`**:
