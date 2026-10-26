@@ -1,4 +1,4 @@
-name: Sync Code to Databricks
+name: Deploy Databricks Asset Bundle
 
 on:
   push:
@@ -26,37 +26,21 @@ jobs:
         run: |
           databricks bundle validate
 
-  sync-repo:
-    name: Update Shared Git Folder
+  deploy:
+    name: Deploy Bundle
     needs: validate
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-        
+
       - name: Setup Databricks CLI
         uses: databricks/setup-cli@main
 
-      - name: Configure Git Credentials
+      - name: Deploy Bundle to Workspace
         env:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: |
-          CRED_ID=$(databricks git-credentials list -o json 2>/dev/null | jq -r '.. | .credential_id? // empty' | head -n 1)
-          if [ -n "$CRED_ID" ]; then
-            databricks git-credentials update "$CRED_ID" gitHub \
-              --git-username xylorex1919 \
-              --personal-access-token "${{ secrets.GIT_PAT }}"
-          else
-            databricks git-credentials create gitHub \
-              --git-username xylorex1919 \
-              --personal-access-token "${{ secrets.GIT_PAT }}"
-          fi
-
-      - name: Pull Latest Code
-        env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-        run: |
-          databricks repos update /Workspace/Shared/Capstone-Project-Prod --branch main
+          databricks bundle deploy -t prod
