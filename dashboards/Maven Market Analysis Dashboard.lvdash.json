@@ -1642,7 +1642,7 @@
           },
           "position": {
             "x": 0,
-            "y": 2,
+            "y": 4,
             "width": 3,
             "height": 1
           }
@@ -1691,7 +1691,7 @@
           },
           "position": {
             "x": 3,
-            "y": 2,
+            "y": 4,
             "width": 3,
             "height": 1
           }
@@ -1740,7 +1740,7 @@
           },
           "position": {
             "x": 6,
-            "y": 2,
+            "y": 4,
             "width": 2,
             "height": 1
           }
@@ -1789,7 +1789,7 @@
           },
           "position": {
             "x": 8,
-            "y": 2,
+            "y": 4,
             "width": 2,
             "height": 1
           }
@@ -1838,7 +1838,7 @@
           },
           "position": {
             "x": 10,
-            "y": 2,
+            "y": 4,
             "width": 2,
             "height": 1
           }
@@ -1906,7 +1906,7 @@
           },
           "position": {
             "x": 0,
-            "y": 0,
+            "y": 2,
             "width": 3,
             "height": 2
           }
@@ -1974,7 +1974,7 @@
           },
           "position": {
             "x": 3,
-            "y": 0,
+            "y": 2,
             "width": 3,
             "height": 2
           }
@@ -2041,7 +2041,7 @@
           },
           "position": {
             "x": 9,
-            "y": 0,
+            "y": 2,
             "width": 3,
             "height": 2
           }
@@ -2109,7 +2109,7 @@
           },
           "position": {
             "x": 6,
-            "y": 0,
+            "y": 2,
             "width": 3,
             "height": 2
           }
@@ -2227,7 +2227,7 @@
           },
           "position": {
             "x": 0,
-            "y": 9,
+            "y": 11,
             "width": 12,
             "height": 6
           }
@@ -2333,7 +2333,7 @@
           },
           "position": {
             "x": 3,
-            "y": 27,
+            "y": 29,
             "width": 6,
             "height": 7
           }
@@ -2431,7 +2431,7 @@
           },
           "position": {
             "x": 0,
-            "y": 21,
+            "y": 23,
             "width": 12,
             "height": 6
           }
@@ -2614,7 +2614,7 @@
           },
           "position": {
             "x": 0,
-            "y": 3,
+            "y": 5,
             "width": 11,
             "height": 6
           }
@@ -2694,9 +2694,26 @@
           },
           "position": {
             "x": 0,
-            "y": 15,
+            "y": 17,
             "width": 12,
             "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "a14d86ae",
+            "multilineTextboxSpec": {
+              "lines": [
+                "<span style=\"text-align:center;display:block\"><span style=\"font-size:40px;line-height:1.5;color:#00FFD8;font-weight:700\">{{ filter:filter_region }}</span></span>\n",
+                "<p>&nbsp;</p>\n"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 2
           }
         }
       ],
@@ -2751,7 +2768,7 @@
           },
           "position": {
             "x": 0,
-            "y": 2,
+            "y": 4,
             "width": 3,
             "height": 1
           }
@@ -2800,7 +2817,7 @@
           },
           "position": {
             "x": 3,
-            "y": 2,
+            "y": 4,
             "width": 3,
             "height": 1
           }
@@ -2849,7 +2866,7 @@
           },
           "position": {
             "x": 6,
-            "y": 2,
+            "y": 4,
             "width": 2,
             "height": 1
           }
@@ -2898,7 +2915,7 @@
           },
           "position": {
             "x": 8,
-            "y": 2,
+            "y": 4,
             "width": 2,
             "height": 1
           }
@@ -2947,7 +2964,7 @@
           },
           "position": {
             "x": 10,
-            "y": 2,
+            "y": 4,
             "width": 2,
             "height": 1
           }
@@ -3015,7 +3032,7 @@
           },
           "position": {
             "x": 0,
-            "y": 0,
+            "y": 2,
             "width": 3,
             "height": 2
           }
@@ -3083,7 +3100,7 @@
           },
           "position": {
             "x": 3,
-            "y": 0,
+            "y": 2,
             "width": 3,
             "height": 2
           }
@@ -3150,7 +3167,7 @@
           },
           "position": {
             "x": 9,
-            "y": 0,
+            "y": 2,
             "width": 3,
             "height": 2
           }
@@ -3218,7 +3235,7 @@
           },
           "position": {
             "x": 6,
-            "y": 0,
+            "y": 2,
             "width": 3,
             "height": 2
           }
@@ -3301,7 +3318,7 @@
           },
           "position": {
             "x": 0,
-            "y": 10,
+            "y": 12,
             "width": 12,
             "height": 6
           }
@@ -3414,7 +3431,7 @@
           },
           "position": {
             "x": 2,
-            "y": 29,
+            "y": 31,
             "width": 8,
             "height": 7
           }
@@ -3636,7 +3653,7 @@
           },
           "position": {
             "x": 0,
-            "y": 3,
+            "y": 5,
             "width": 12,
             "height": 7
           }
@@ -3733,7 +3750,7 @@
           },
           "position": {
             "x": 0,
-            "y": 16,
+            "y": 18,
             "width": 12,
             "height": 6
           }
@@ -3825,9 +3842,26 @@
           },
           "position": {
             "x": 2,
-            "y": 22,
+            "y": 24,
             "width": 8,
             "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "20722bc6",
+            "multilineTextboxSpec": {
+              "lines": [
+                "<span style=\"text-align:center;display:block\"><span style=\"font-size:40px;line-height:1.5;color:#00FFD8;font-weight:700\">{{ filter:66947d85 }}</span></span>\n",
+                "<p>&nbsp;</p>\n"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 2
           }
         }
       ],
@@ -3882,7 +3916,7 @@
           },
           "position": {
             "x": 0,
-            "y": 2,
+            "y": 4,
             "width": 3,
             "height": 1
           }
@@ -3931,7 +3965,7 @@
           },
           "position": {
             "x": 3,
-            "y": 2,
+            "y": 4,
             "width": 2,
             "height": 1
           }
@@ -3980,7 +4014,7 @@
           },
           "position": {
             "x": 5,
-            "y": 2,
+            "y": 4,
             "width": 3,
             "height": 1
           }
@@ -4029,7 +4063,7 @@
           },
           "position": {
             "x": 8,
-            "y": 2,
+            "y": 4,
             "width": 2,
             "height": 1
           }
@@ -4078,7 +4112,7 @@
           },
           "position": {
             "x": 10,
-            "y": 2,
+            "y": 4,
             "width": 2,
             "height": 1
           }
@@ -4146,7 +4180,7 @@
           },
           "position": {
             "x": 6,
-            "y": 0,
+            "y": 2,
             "width": 3,
             "height": 2
           }
@@ -4214,7 +4248,7 @@
           },
           "position": {
             "x": 3,
-            "y": 0,
+            "y": 2,
             "width": 3,
             "height": 2
           }
@@ -4281,7 +4315,7 @@
           },
           "position": {
             "x": 9,
-            "y": 0,
+            "y": 2,
             "width": 3,
             "height": 2
           }
@@ -4377,7 +4411,7 @@
           },
           "position": {
             "x": 0,
-            "y": 16,
+            "y": 18,
             "width": 12,
             "height": 6
           }
@@ -4461,7 +4495,7 @@
           },
           "position": {
             "x": 0,
-            "y": 28,
+            "y": 30,
             "width": 12,
             "height": 6
           }
@@ -4545,7 +4579,7 @@
           },
           "position": {
             "x": 0,
-            "y": 10,
+            "y": 12,
             "width": 12,
             "height": 6
           }
@@ -4645,7 +4679,7 @@
           },
           "position": {
             "x": 0,
-            "y": 22,
+            "y": 24,
             "width": 12,
             "height": 6
           }
@@ -4807,7 +4841,7 @@
           },
           "position": {
             "x": 0,
-            "y": 3,
+            "y": 5,
             "width": 12,
             "height": 7
           }
@@ -4878,8 +4912,25 @@
           },
           "position": {
             "x": 0,
-            "y": 0,
+            "y": 2,
             "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "3e837c97",
+            "multilineTextboxSpec": {
+              "lines": [
+                "<span style=\"text-align:center;display:block\"><span style=\"font-size:40px;line-height:1.5;color:#00FFD8;font-weight:700\">{{ filter:filter_category }}</span></span>\n",
+                "<p>&nbsp;</p>\n"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
             "height": 2
           }
         }
@@ -4935,7 +4986,7 @@
           },
           "position": {
             "x": 0,
-            "y": 2,
+            "y": 4,
             "width": 3,
             "height": 1
           }
@@ -4984,7 +5035,7 @@
           },
           "position": {
             "x": 3,
-            "y": 2,
+            "y": 4,
             "width": 3,
             "height": 1
           }
@@ -5033,7 +5084,7 @@
           },
           "position": {
             "x": 6,
-            "y": 2,
+            "y": 4,
             "width": 3,
             "height": 1
           }
@@ -5082,7 +5133,7 @@
           },
           "position": {
             "x": 9,
-            "y": 2,
+            "y": 4,
             "width": 3,
             "height": 1
           }
@@ -5145,7 +5196,7 @@
           },
           "position": {
             "x": 0,
-            "y": 0,
+            "y": 2,
             "width": 3,
             "height": 2
           }
@@ -5208,7 +5259,7 @@
           },
           "position": {
             "x": 3,
-            "y": 0,
+            "y": 2,
             "width": 3,
             "height": 2
           }
@@ -5270,7 +5321,7 @@
           },
           "position": {
             "x": 6,
-            "y": 0,
+            "y": 2,
             "width": 3,
             "height": 2
           }
@@ -5333,7 +5384,7 @@
           },
           "position": {
             "x": 9,
-            "y": 0,
+            "y": 2,
             "width": 3,
             "height": 2
           }
@@ -5431,7 +5482,7 @@
           },
           "position": {
             "x": 0,
-            "y": 25,
+            "y": 27,
             "width": 7,
             "height": 7
           }
@@ -5520,7 +5571,7 @@
           },
           "position": {
             "x": 0,
-            "y": 3,
+            "y": 5,
             "width": 12,
             "height": 6
           }
@@ -5720,7 +5771,7 @@
           },
           "position": {
             "x": 0,
-            "y": 21,
+            "y": 23,
             "width": 12,
             "height": 4
           }
@@ -5841,7 +5892,7 @@
           },
           "position": {
             "x": 0,
-            "y": 9,
+            "y": 11,
             "width": 12,
             "height": 6
           }
@@ -5915,9 +5966,26 @@
           },
           "position": {
             "x": 0,
-            "y": 15,
+            "y": 17,
             "width": 12,
             "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "2500a860",
+            "multilineTextboxSpec": {
+              "lines": [
+                "<span style=\"text-align:center;display:block\"><span style=\"font-size:40px;line-height:1.5;color:#00FFD8;font-weight:700\">{{ filter:f_product }}</span></span>\n",
+                "<p>&nbsp;</p>\n"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 2
           }
         }
       ],
