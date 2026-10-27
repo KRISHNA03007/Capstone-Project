@@ -29,11 +29,7 @@ targets:
 
 resources:
   dashboards:
-    maven_market_analysis:
-      display_name: "Maven Market Analysis"
-      file_path: ./dashboards/Maven Market Analysis.lvdash.json
-      warehouse_id: ${var.sql_warehouse_id}
-
+  
     maven_market_data_quality:
       display_name: "Maven Market - Data Quality & Governance Dashboard"
       file_path: ./dashboards/Maven Market - Data Quality & Governance Dashboard.lvdash.json
@@ -44,7 +40,7 @@ resources:
       file_path: ./dashboards/Maven Market Secure Analytics 2.lvdash.json
       warehouse_id: ${var.sql_warehouse_id}
 
-    maven_market_secure_analysis:
+    maven_market_analysis_dashboard:
       display_name: "Maven Market Analysis Dashboard"
       file_path: ./dashboards/Maven Market Analysis Dashboard.lvdash.json
       warehouse_id: ${var.sql_warehouse_id}
