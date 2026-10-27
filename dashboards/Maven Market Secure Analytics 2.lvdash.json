@@ -160,10 +160,6 @@
                   "datasetName": "1edf4b98",
                   "fields": [
                     {
-                      "name": "persona",
-                      "expression": "`persona`"
-                    },
-                    {
                       "name": "viewer",
                       "expression": "`viewer`"
                     }
@@ -177,7 +173,7 @@
                 "showDescription": false,
                 "showTitle": true,
                 "title": {
-                  "value": "viewer details",
+                  "value": "<span style=\"color: #FFAB00;\">viewer details</span>",
                   "fields": []
                 }
               },
@@ -186,13 +182,15 @@
               "encodings": {
                 "value": {
                   "fieldName": "viewer"
-                },
-                "target": {
-                  "fieldName": "persona"
                 }
               },
               "data": {
                 "queryName": "main_query"
+              }
+            },
+            "specExtensions": {
+              "widgetBorderColor": {
+                "light": "#4ACE14"
               }
             }
           },
@@ -225,7 +223,7 @@
               "frame": {
                 "showTitle": true,
                 "title": {
-                  "value": "Revenue",
+                  "value": "<span style=\"color: #FFAB00;\">Revenue</span>",
                   "fields": []
                 }
               },
@@ -238,6 +236,11 @@
               },
               "data": {
                 "queryName": "main_query"
+              }
+            },
+            "specExtensions": {
+              "widgetBorderColor": {
+                "light": "#4ACE14"
               }
             }
           },
@@ -270,7 +273,7 @@
               "frame": {
                 "showTitle": true,
                 "title": {
-                  "value": "unit\\_sold",
+                  "value": "<span style=\"color: #FFAB00;\">unit\\_sold</span>",
                   "fields": []
                 }
               },
@@ -283,6 +286,11 @@
               },
               "data": {
                 "queryName": "main_query"
+              }
+            },
+            "specExtensions": {
+              "widgetBorderColor": {
+                "light": "#4ACE14"
               }
             }
           },
@@ -315,7 +323,7 @@
               "frame": {
                 "showTitle": true,
                 "title": {
-                  "value": "profit",
+                  "value": "<span style=\"color: #FFAB00;\">profit</span>",
                   "fields": []
                 }
               },
@@ -328,6 +336,11 @@
               },
               "data": {
                 "queryName": "main_query"
+              }
+            },
+            "specExtensions": {
+              "widgetBorderColor": {
+                "light": "#4ACE14"
               }
             }
           },
@@ -360,7 +373,7 @@
               "frame": {
                 "showTitle": true,
                 "title": {
-                  "value": "stores",
+                  "value": "<span style=\"color: #FFAB00;\">stores</span>",
                   "fields": []
                 }
               },
@@ -373,6 +386,11 @@
               },
               "data": {
                 "queryName": "main_query"
+              }
+            },
+            "specExtensions": {
+              "widgetBorderColor": {
+                "light": "#4ACE14"
               }
             }
           },
@@ -413,7 +431,7 @@
               "frame": {
                 "showTitle": true,
                 "title": {
-                  "value": "Revenue Trend",
+                  "value": "<span style=\"color: #FFAB00;\">Revenue Trend</span>",
                   "fields": []
                 }
               },
@@ -442,6 +460,11 @@
               },
               "data": {
                 "queryName": "main_query"
+              }
+            },
+            "specExtensions": {
+              "widgetBorderColor": {
+                "light": "#4ACE14"
               }
             }
           },
@@ -478,7 +501,7 @@
               "frame": {
                 "showTitle": true,
                 "title": {
-                  "value": "Revenue by Region",
+                  "value": "<span style=\"color: #FFAB00;\">Revenue by Region</span>",
                   "fields": []
                 }
               },
@@ -500,6 +523,11 @@
               },
               "data": {
                 "queryName": "main_query"
+              }
+            },
+            "specExtensions": {
+              "widgetBorderColor": {
+                "light": "#4ACE14"
               }
             }
           },
@@ -536,7 +564,7 @@
               "frame": {
                 "showTitle": true,
                 "title": {
-                  "value": "Top Stores",
+                  "value": "<span style=\"color: #FFAB00;\">Top Stores</span>",
                   "fields": []
                 }
               },
@@ -558,6 +586,11 @@
               },
               "data": {
                 "queryName": "main_query"
+              }
+            },
+            "specExtensions": {
+              "widgetBorderColor": {
+                "light": "#4ACE14"
               }
             }
           },
@@ -594,7 +627,7 @@
               "frame": {
                 "showTitle": true,
                 "title": {
-                  "value": "Category Performance",
+                  "value": "<span style=\"color: #FFAB00;\">Category Performance</span>",
                   "fields": []
                 }
               },
@@ -616,6 +649,11 @@
               },
               "data": {
                 "queryName": "main_query"
+              }
+            },
+            "specExtensions": {
+              "widgetBorderColor": {
+                "light": "#4ACE14"
               }
             }
           },
@@ -652,7 +690,7 @@
               "frame": {
                 "showTitle": true,
                 "title": {
-                  "value": "Returns by Month",
+                  "value": "<span style=\"color: #FFAB00;\">Returns by Month</span>",
                   "fields": []
                 }
               },
@@ -674,6 +712,11 @@
               },
               "data": {
                 "queryName": "main_query"
+              }
+            },
+            "specExtensions": {
+              "widgetBorderColor": {
+                "light": "#4ACE14"
               }
             }
           },
@@ -734,7 +777,7 @@
               "frame": {
                 "showTitle": true,
                 "title": {
-                  "value": "Customer Details",
+                  "value": "<span style=\"color: #FFAB00;\">Customer Details</span>",
                   "fields": []
                 }
               },
@@ -771,6 +814,11 @@
               "data": {
                 "queryName": "main_query"
               }
+            },
+            "specExtensions": {
+              "widgetBorderColor": {
+                "light": "#4ACE14"
+              }
             }
           },
           "position": {
@@ -806,7 +854,7 @@
               "frame": {
                 "showTitle": true,
                 "title": {
-                  "value": "Units Sold by Region",
+                  "value": "<span style=\"color: #FFAB00;\">Units Sold by Region</span>",
                   "fields": []
                 }
               },
@@ -828,6 +876,11 @@
               },
               "data": {
                 "queryName": "main_query"
+              }
+            },
+            "specExtensions": {
+              "widgetBorderColor": {
+                "light": "#4ACE14"
               }
             }
           },
@@ -868,7 +921,7 @@
               "frame": {
                 "showTitle": true,
                 "title": {
-                  "value": "Region wise store performance",
+                  "value": "<span style=\"color: #FFAB00;\">Region wise store performance</span>",
                   "fields": []
                 }
               },
@@ -889,6 +942,11 @@
               },
               "data": {
                 "queryName": "main_query"
+              }
+            },
+            "specExtensions": {
+              "widgetBorderColor": {
+                "light": "#4ACE14"
               }
             }
           },
