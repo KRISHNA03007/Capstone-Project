@@ -44,6 +44,11 @@ resources:
       file_path: ./dashboards/Maven Market Secure Analytics 2.lvdash.json
       warehouse_id: ${var.sql_warehouse_id}
 
+    maven_market_secure_analysis:
+      display_name: "Maven Market Analysis Dashboard"
+      file_path: ./dashboards/Maven Market Analysis Dashboard.lvdash.json
+      warehouse_id: ${var.sql_warehouse_id}
+
   genie_spaces:
     maven_market_executive_agent:
       title: "Maven Market Executive Agent"
