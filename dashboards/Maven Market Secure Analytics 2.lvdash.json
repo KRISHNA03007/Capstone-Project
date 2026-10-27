@@ -148,24 +148,8 @@
   "pages": [
     {
       "name": "4a1d47b2",
-      "displayName": "Untitled page",
+      "displayName": "Secure Page",
       "layout": [
-        {
-          "widget": {
-            "name": "5a120d5f",
-            "multilineTextboxSpec": {
-              "lines": [
-                ""
-              ]
-            }
-          },
-          "position": {
-            "x": 0,
-            "y": 0,
-            "width": 12,
-            "height": 1
-          }
-        },
         {
           "widget": {
             "name": "user",
@@ -176,16 +160,12 @@
                   "datasetName": "1edf4b98",
                   "fields": [
                     {
-                      "name": "viewer",
-                      "expression": "`viewer`"
-                    },
-                    {
                       "name": "persona",
                       "expression": "`persona`"
                     },
                     {
-                      "name": "region_scope",
-                      "expression": "`region_scope`"
+                      "name": "viewer",
+                      "expression": "`viewer`"
                     }
                   ],
                   "disaggregated": true
@@ -202,19 +182,14 @@
                 }
               },
               "version": 2,
-              "widgetType": "table",
+              "widgetType": "counter",
               "encodings": {
-                "columns": [
-                  {
-                    "fieldName": "viewer"
-                  },
-                  {
-                    "fieldName": "persona"
-                  },
-                  {
-                    "fieldName": "region_scope"
-                  }
-                ]
+                "value": {
+                  "fieldName": "viewer"
+                },
+                "target": {
+                  "fieldName": "persona"
+                }
               },
               "data": {
                 "queryName": "main_query"
@@ -223,7 +198,7 @@
           },
           "position": {
             "x": 0,
-            "y": 1,
+            "y": 0,
             "width": 12,
             "height": 2
           }
@@ -268,7 +243,7 @@
           },
           "position": {
             "x": 0,
-            "y": 3,
+            "y": 2,
             "width": 3,
             "height": 3
           }
@@ -313,7 +288,7 @@
           },
           "position": {
             "x": 3,
-            "y": 3,
+            "y": 2,
             "width": 3,
             "height": 3
           }
@@ -358,7 +333,7 @@
           },
           "position": {
             "x": 6,
-            "y": 3,
+            "y": 2,
             "width": 3,
             "height": 3
           }
@@ -403,7 +378,7 @@
           },
           "position": {
             "x": 9,
-            "y": 3,
+            "y": 2,
             "width": 3,
             "height": 3
           }
@@ -472,7 +447,7 @@
           },
           "position": {
             "x": 6,
-            "y": 11,
+            "y": 10,
             "width": 6,
             "height": 6
           }
@@ -530,7 +505,7 @@
           },
           "position": {
             "x": 0,
-            "y": 17,
+            "y": 16,
             "width": 6,
             "height": 6
           }
@@ -588,7 +563,7 @@
           },
           "position": {
             "x": 0,
-            "y": 11,
+            "y": 10,
             "width": 6,
             "height": 6
           }
@@ -646,7 +621,7 @@
           },
           "position": {
             "x": 6,
-            "y": 17,
+            "y": 16,
             "width": 6,
             "height": 6
           }
@@ -704,7 +679,7 @@
           },
           "position": {
             "x": 0,
-            "y": 23,
+            "y": 22,
             "width": 6,
             "height": 6
           }
@@ -800,7 +775,7 @@
           },
           "position": {
             "x": 0,
-            "y": 29,
+            "y": 28,
             "width": 12,
             "height": 5
           }
@@ -858,7 +833,7 @@
           },
           "position": {
             "x": 6,
-            "y": 23,
+            "y": 22,
             "width": 6,
             "height": 6
           }
@@ -919,7 +894,7 @@
           },
           "position": {
             "x": 0,
-            "y": 6,
+            "y": 5,
             "width": 12,
             "height": 5
           }
